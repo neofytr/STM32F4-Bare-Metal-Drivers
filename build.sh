@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# Check if the correct number of arguments is provided
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <source_file_without_extension> <output_file_without_extension>"
+    exit 1
+fi
+
+# Assign arguments to variables
+SOURCE_FILE="./Source/$1"
+OUTPUT_ELF="$2.elf"
+OUTPUT_BIN="$2.bin"
+LINKER_SCRIPT="./LinkerScript/STM32F401RETX_FLASH.ld"
+MAP_FILE="$2.map"
+
+# Compile and link the project with optimizations
+arm-none-eabi-gcc \
+    -mcpu=cortex-m4 \
+    -mthumb \
+    -mfpu=fpv4-sp-d16 \
+    -mfloat-abi=hard \
+    -DSTM32F401RETx \
+    -DNUCLEO_F401RE \
+    -O2 -Os \
+    -Wall \
+    "$SOURCE_FILE" \
+    ./Startup/startup_stm32f401retx.s \
+    ./PseudoSyscalls/syscalls.c \
+    ./PseudoSyscalls/sysmem.c \
+    -T "$LINKER_SCRIPT" \
+    --specs=nano.specs \
+    -o "$OUTPUT_ELF" \
+    -Wl,-Map,"$MAP_FILE" \
+    -Wl,--gc-sections  # Remove unused sections
+
+# Convert ELF to binary
+arm-none-eabi-objcopy -O binary "$OUTPUT_ELF" "$OUTPUT_BIN"
+
+echo "Compilation and linking complete."
+echo "Output ELF: $OUTPUT_ELF"
+echo "Output Binary: $OUTPUT_BIN"
+echo "Map File: $MAP_FILE"
