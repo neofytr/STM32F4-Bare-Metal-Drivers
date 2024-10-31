@@ -8,10 +8,10 @@ fi
 
 # Assign arguments to variables
 SOURCE_FILE="./Source/$1"
-OUTPUT_ELF="$2.elf"
-OUTPUT_BIN="$2.bin"
-LINKER_SCRIPT="./LinkerScript/STM32F401RETX_FLASH.ld"
-MAP_FILE="$2.map"
+OUTPUT_ELF="Binaries/$2.elf"
+OUTPUT_BIN="Binaries/$2.bin"
+LINKER_SCRIPT="./LinkerScript/linker.ld"
+MAP_FILE="Binaries/$2.map"
 
 # Compile and link the project with optimizations
 arm-none-eabi-gcc \
@@ -24,7 +24,7 @@ arm-none-eabi-gcc \
     -O2 -Os \
     -Wall \
     "$SOURCE_FILE" \
-    ./Startup/startup_stm32f401retx.s \
+    ./Startup/startup.s \
     ./PseudoSyscalls/syscalls.c \
     ./PseudoSyscalls/sysmem.c \
     -T "$LINKER_SCRIPT" \
