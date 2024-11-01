@@ -10,7 +10,7 @@ fi
 SOURCE_FILE="./Source/$1"
 OUTPUT_ELF="Binaries/$2.elf"
 OUTPUT_BIN="Binaries/$2.bin"
-LINKER_SCRIPT="./LinkerScript/linker.ld"
+LINKER_SCRIPT="../coresys/LinkerScript/linker.ld"
 MAP_FILE="Binaries/$2.map"
 
 # Compile and link the project with optimizations
@@ -24,9 +24,9 @@ arm-none-eabi-gcc \
     -O2 -Os \
     -Wall \
     "$SOURCE_FILE" \
-    ./Startup/startup.s \
-    ./PseudoSyscalls/syscalls.c \
-    ./PseudoSyscalls/sysmem.c \
+    ../coresys/Startup/startup.s \
+    ../coresys/PseudoSyscalls/syscalls.c \
+    ../coresys/PseudoSyscalls/sysmem.c \
     -T "$LINKER_SCRIPT" \
     --specs=nano.specs \
     -o "$OUTPUT_ELF" \

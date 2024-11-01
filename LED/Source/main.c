@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "../Includes/core/core_cm4.h"
+#include "../../coresys/Includes/STM32F401.h"
 
 #define GPIOA_EN (1UL << 0) // first bit in the AHB1 enable register is for enabling GPIOA
 #define PIN5 (1UL << 5)     // 5th bit in the GPIOA output data register is for sending data to PIN5
