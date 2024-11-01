@@ -78,7 +78,6 @@ Discarded input sections
                 0x00000000       0xcf /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/crt0.o
  .ARM.attributes
                 0x00000000       0x20 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/crt0.o
- .text          0x00000000        0x0 Binaries/main.o
  .data          0x00000000        0x0 Binaries/main.o
  .bss           0x00000000        0x0 Binaries/main.o
  .text          0x00000000       0x20 Binaries/startup.o
@@ -366,69 +365,72 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
                 0x08000000                g_pfnVectors
                 0x08000170                        . = ALIGN (0x4)
 
-.text           0x08000200      0x264
+.text           0x08000200      0x364
                 0x08000200                        . = ALIGN (0x4)
- *(.text)
  *(.text*)
- .text.startup  0x08000200       0x58 Binaries/main.o
-                0x08000200                main
- *fill*         0x08000258        0x8 
+ .text          0x08000200       0xa0 Binaries/main.o
+                0x08000200                UART2_tx_init
+                0x08000290                UART2_write
+ .text.startup  0x080002a0        0xe Binaries/main.o
+                0x080002a0                main
+ *fill*         0x080002ae        0x2 
  .text.Reset_Handler
-                0x08000260       0x5c Binaries/startup.o
-                0x08000260                Reset_Handler
- *fill*         0x080002bc       0x44 
+                0x080002b0       0x5c Binaries/startup.o
+                0x080002b0                Reset_Handler
+ *fill*         0x0800030c       0xf4 
  .text.Default_Handler
-                0x08000300      0x100 Binaries/startup.o
-                0x08000300                DebugMon_Handler
-                0x08000300                HardFault_Handler
-                0x08000300                SysTick_Handler
-                0x08000300                PendSV_Handler
-                0x08000300                NMI_Handler
-                0x08000300                UsageFault_Handler
-                0x08000300                Default_Handler
-                0x08000300                MemManage_Handler
-                0x08000300                SVC_Handler
-                0x08000300                BusFault_Handler
+                0x08000400      0x100 Binaries/startup.o
+                0x08000400                DebugMon_Handler
+                0x08000400                HardFault_Handler
+                0x08000400                SysTick_Handler
+                0x08000400                PendSV_Handler
+                0x08000400                NMI_Handler
+                0x08000400                UsageFault_Handler
+                0x08000400                Default_Handler
+                0x08000400                MemManage_Handler
+                0x08000400                SVC_Handler
+                0x08000400                BusFault_Handler
  .text.SystemInit
-                0x08000400        0x2 Binaries/startup.o
-                0x08000400                SystemInit
- *fill*         0x08000402        0x2 
+                0x08000500        0x2 Binaries/startup.o
+                0x08000500                SystemInit
+ *fill*         0x08000502        0x2 
  .text.__libc_init_array
-                0x08000404       0x48 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
-                0x08000404                __libc_init_array
+                0x08000504       0x48 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+                0x08000504                __libc_init_array
+ *(.text)
  *(.glue_7)
- .glue_7        0x0800044c        0x0 linker stubs
+ .glue_7        0x0800054c        0x0 linker stubs
  *(.glue_7t)
- .glue_7t       0x0800044c        0x0 linker stubs
+ .glue_7t       0x0800054c        0x0 linker stubs
  *(.eh_frame)
  *(.init)
- .init          0x0800044c        0x4 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crti.o
-                0x0800044c                _init
- .init          0x08000450        0x8 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtn.o
+ .init          0x0800054c        0x4 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crti.o
+                0x0800054c                _init
+ .init          0x08000550        0x8 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtn.o
  *(.fini)
- .fini          0x08000458        0x4 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crti.o
-                0x08000458                _fini
- .fini          0x0800045c        0x8 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtn.o
-                0x08000464                        . = ALIGN (0x4)
-                0x08000464                        _etext = .
+ .fini          0x08000558        0x4 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crti.o
+                0x08000558                _fini
+ .fini          0x0800055c        0x8 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtn.o
+                0x08000564                        . = ALIGN (0x4)
+                0x08000564                        _etext = .
 
-.vfp11_veneer   0x08000464        0x0
- .vfp11_veneer  0x08000464        0x0 linker stubs
+.vfp11_veneer   0x08000564        0x0
+ .vfp11_veneer  0x08000564        0x0 linker stubs
 
-.v4_bx          0x08000464        0x0
- .v4_bx         0x08000464        0x0 linker stubs
+.v4_bx          0x08000564        0x0
+ .v4_bx         0x08000564        0x0 linker stubs
 
-.iplt           0x08000464        0x0
- .iplt          0x08000464        0x0 Binaries/startup.o
+.iplt           0x08000564        0x0
+ .iplt          0x08000564        0x0 Binaries/main.o
 
-.rel.dyn        0x08000464        0x0
- .rel.iplt      0x08000464        0x0 Binaries/startup.o
+.rel.dyn        0x08000564        0x0
+ .rel.iplt      0x08000564        0x0 Binaries/main.o
 
-.rodata         0x08000464        0x0
-                0x08000464                        . = ALIGN (0x4)
+.rodata         0x08000564        0x0
+                0x08000564                        . = ALIGN (0x4)
  *(.rodata)
  *(.rodata*)
-                0x08000464                        . = ALIGN (0x4)
+                0x08000564                        . = ALIGN (0x4)
                 [0x00000000]                      _sidata = LOADADDR (.data)
 
 .data           0x20000000        0x0 load address 0x00000000
@@ -440,7 +442,7 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
                 0x20000000                        _edata = .
 
 .igot.plt       0x20000000        0x0
- .igot.plt      0x20000000        0x0 Binaries/startup.o
+ .igot.plt      0x20000000        0x0 Binaries/main.o
 
 .bss            0x20000000        0x0
                 0x20000000                        . = ALIGN (0x4)

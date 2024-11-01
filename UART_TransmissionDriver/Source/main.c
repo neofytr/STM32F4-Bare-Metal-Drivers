@@ -14,8 +14,8 @@ Similarly, data sent from the USART2 of STM32 can travel back to the computer th
 
 // USART2 is connected to the APB1 bus
 #define USART2_EN_BIT 17
-// GPIOD is connected to the AHB1 bus
-#define GPIOD_EN_BIT 3
+// GPIOA is connected to the AHB1 bus
+#define GPIOA_EN_BIT 0
 
 #define SYS_CLOCK 16000000 // the default system clock (if clock tree not configured) on stm32 is 16MHz
 // In the clock tree, the system clock is taken and then divided by a value; and then what is derived after this division
@@ -26,7 +26,7 @@ Similarly, data sent from the USART2 of STM32 can travel back to the computer th
 
 #define UART_BAUD_RATE 115200
 
-#define TX_PIN 5
+#define TX_PIN 2
 
 #define WORD_LENGTH_BIT 12
 #define PARITY_CONTROL_BIT 10
@@ -34,9 +34,7 @@ Similarly, data sent from the USART2 of STM32 can travel back to the computer th
 
 The parity control bit sets the hardware parity control (generation and detection)/
 When the parity control is enabled, the computed parity is inserted at the MSB position (9th if word bit is 1, and 8th if its 0)
-and parity is checked on the received data
-
-*/
+and parity is checked on the received data */
 
 #define TRANSMITTER_ENABLE_BIT 3
 
@@ -57,33 +55,33 @@ and parity is checked on the received data
 void UART2_tx_init(void);
 void UART2_write(char chr);
 
-static inline void uart_set_baudrate(USART_TypeDef *USARTx, uint32_t periph_clock, uint32_t baud_rate)
-{
-    USARTx->BRR = compute_uart_div(periph_clock, baud_rate);
-}
-
 static inline uint32_t compute_uart_div(uint32_t periph_clock, uint32_t baud_rate)
 {
     return ((periph_clock + baud_rate / 2U) / baud_rate);
 }
 
+static inline void uart_set_baudrate(USART_TypeDef *USARTx, uint32_t periph_clock, uint32_t baud_rate)
+{
+    USARTx->BRR = compute_uart_div(periph_clock, baud_rate);
+}
+
 void UART2_tx_init(void)
 {
     // configuring UART2 GPIO TX pin
-    // enable clock access to GPIOD
-    SET_BIT(RCC->AHB1ENR, GPIOD_EN_BIT);
-    // set PD5 to alternate function mode
-    CLEAR_BIT(GPIOD->MODER, TX_PIN * 2);
-    SET_BIT(GPIOD->MODER, TX_PIN * 2 + 1);
-    // set PD5 alternate function type to AF07 (UART_TX); AF07 is 0111
-    SET_BIT(GPIOD->AFR[0], 4 * TX_PIN);
-    SET_BIT(GPIOD->AFR[0], 4 * TX_PIN + 1);
-    SET_BIT(GPIOD->AFR[0], 4 * TX_PIN + 2);
-    CLEAR_BIT(GPIOD->AFR[0], 4 * TX_PIN + 3);
+    // enable clock access to GPIOA
+    SET_BIT(RCC->AHB1ENR, GPIOA_EN_BIT);
+    // set PA2 to alternate function mode
+    CLEAR_BIT(GPIOA->MODER, TX_PIN * 2);
+    SET_BIT(GPIOA->MODER, TX_PIN * 2 + 1);
+    // set PA2 alternate function type to AF07 (UART_TX); AF07 is 0111
+    SET_BIT(GPIOA->AFR[0], 4 * TX_PIN);
+    SET_BIT(GPIOA->AFR[0], 4 * TX_PIN + 1);
+    SET_BIT(GPIOA->AFR[0], 4 * TX_PIN + 2);
+    CLEAR_BIT(GPIOA->AFR[0], 4 * TX_PIN + 3);
 
     // configuring UART2 module
     // enable clock access to UART2
-    SET_BIT(RCC->AHB1ENR, USART2_EN_BIT);
+    SET_BIT(RCC->APB1ENR, USART2_EN_BIT);
     // configure baud rate
     uart_set_baudrate(USART2, APB1_CLOCK, UART_BAUD_RATE);
     // configure the transfer direction
