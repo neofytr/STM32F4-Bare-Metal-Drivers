@@ -33,8 +33,8 @@ SECTIONS
     .text :
     {
         . = ALIGN(4);
-        *(.text)
         *(.text*)
+        *(.text)
         *(.glue_7)         /* ARM/Thumb glue code */
         *(.glue_7t)        /* Thumb/ARM glue code */
         *(.eh_frame)

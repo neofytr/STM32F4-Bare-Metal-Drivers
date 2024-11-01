@@ -368,13 +368,15 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
 
 .text           0x08000200      0x264
                 0x08000200                        . = ALIGN (0x4)
+ *(.text)
  *(.text*)
- .text.startup  0x08000200       0x40 Binaries/main.o
+ .text.startup  0x08000200       0x58 Binaries/main.o
                 0x08000200                main
+ *fill*         0x08000258        0x8 
  .text.Reset_Handler
-                0x08000240       0x5c Binaries/startup.o
-                0x08000240                Reset_Handler
- *fill*         0x0800029c       0x64 
+                0x08000260       0x5c Binaries/startup.o
+                0x08000260                Reset_Handler
+ *fill*         0x080002bc       0x44 
  .text.Default_Handler
                 0x08000300      0x100 Binaries/startup.o
                 0x08000300                DebugMon_Handler
@@ -394,7 +396,6 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
  .text.__libc_init_array
                 0x08000404       0x48 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
                 0x08000404                __libc_init_array
- *(.text)
  *(.glue_7)
  .glue_7        0x0800044c        0x0 linker stubs
  *(.glue_7t)
