@@ -1,46 +1,47 @@
-// where is the LED connected?
-// Port: A
-// Pin: 5
-
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include "../../coresys/Includes/STM32F401.h"
 
-// User Button is on Port C Pin 13
-// So we need to enable clock access to this Port C
+// Pin definitions
+#define GPIOA_EN_BIT 0
+#define GPIOC_EN_BIT 2
+#define LED_PIN 5
+#define BTN_PIN 13
 
-// Port C is on AHB1 bus; We need to enable clock access to it in the RCC-AHB1ENR register
-
-// Bit two of RCC-AHB1ENR (if set) enables the clock access to GPIOC
-
-#define GPIOA_EN (1UL << 0)
-#define PIN5 (1UL << 5)
-
-#define GPIOC_EN (1UL << 2)
-#define PIN13 (1UL << 13)
-
-#define BTN_PIN PIN13
-#define LED_PIN PIN5
+// Utility macros
+#define SET_BIT(reg, bit) ((reg) |= (1UL << (bit)))
+#define CLEAR_BIT(reg, bit) ((reg) &= ~(1UL << (bit)))
+#define READ_BIT(reg, bit) ((reg) & (1UL << (bit)))
 
 int main(void)
 {
-    // enable clock access to GPIOA and GPIOC
-    RCC->AHB1ENR |= GPIOC_EN;
-    RCC->AHB1ENR |= GPIOA_EN;
+    // Enable clock access to GPIOA and GPIOC
+    SET_BIT(RCC->AHB1ENR, GPIOA_EN_BIT); // Enable GPIOA clock
+    SET_BIT(RCC->AHB1ENR, GPIOC_EN_BIT); // Enable GPIOC clock
 
-    // set PA5 as output pin (can be done in MODE register of GPIOA)
-    // for output: 01
-    // for pin 5: bit 11 bit 10
-    GPIOA->MODER |= (1UL << 10);    // sets the 10th bit to 1
-    GPIOA->MODER &= (~(1UL << 11)); // sets the 11th bit to 0
+    // Configure PA5 (LED) as output
+    // Clear bits first then set required bit
+    CLEAR_BIT(GPIOA->MODER, (LED_PIN * 2 + 1)); // Clear bit 11
+    SET_BIT(GPIOA->MODER, (LED_PIN * 2));       // Set bit 10
 
-    // set PC13 as input pin
-    // for input: 00
-    // for pin 13: bit 27 bit 26
-    GPIOC->MODER &= (~(1UL << 26));
-    GPIOC->MODER &= (~(1UL << 27));
-    // we didn't really need to do this since the reset state of GPIOC MODE register is all zeroes
+    // Configure PC13 (Button) as input
+    // Input mode is 00, so just clear both bits
+    CLEAR_BIT(GPIOC->MODER, (BTN_PIN * 2));     // Clear bit 26
+    CLEAR_BIT(GPIOC->MODER, (BTN_PIN * 2 + 1)); // Clear bit 27
 
-    
+    while (true)
+    {
+        // Button is active low
+        if (READ_BIT(GPIOC->IDR, BTN_PIN))
+        {
+            // Turn LED on by setting bit in BSRR lower half
+            SET_BIT(GPIOA->BSRR, LED_PIN);
+        }
+        else
+        {
+            // Turn LED off by setting bit in BSRR upper half
+            SET_BIT(GPIOA->BSRR, (LED_PIN + 16));
+        }
+    }
 }
