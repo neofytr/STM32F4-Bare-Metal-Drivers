@@ -10,6 +10,8 @@ Archive member included to satisfy reference by file (symbol)
                               /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/crt0.o (memset)
 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-impure.o)
                               /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-errno.o) (_impure_ptr)
+/opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strlen.o)
+                              Binaries/main.o (strlen)
 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-findfp.o)
                               /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-exit.o) (__stdio_exit_handler)
 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-stdio.o)
@@ -128,6 +130,10 @@ Discarded input sections
                 0x00000000       0x4c /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-impure.o)
  .ARM.attributes
                 0x00000000       0x34 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-impure.o)
+ .data          0x00000000        0x0 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strlen.o)
+ .bss           0x00000000        0x0 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strlen.o)
+ .ARM.extab     0x00000000        0x0 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strlen.o)
+ .eh_frame      0x00000000       0x28 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strlen.o)
  .text          0x00000000        0x0 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-findfp.o)
  .data          0x00000000        0x0 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-findfp.o)
  .bss           0x00000000        0x0 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-findfp.o)
@@ -365,19 +371,19 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
                 0x08000000                g_pfnVectors
                 0x08000170                        . = ALIGN (0x4)
 
-.text           0x08000200      0x364
+.text           0x08000200      0x374
                 0x08000200                        . = ALIGN (0x4)
  *(.text*)
- .text          0x08000200       0xa0 Binaries/main.o
+ .text          0x08000200       0xbc Binaries/main.o
                 0x08000200                UART2_tx_init
-                0x08000290                UART2_write
- .text.startup  0x080002a0        0xe Binaries/main.o
-                0x080002a0                main
- *fill*         0x080002ae        0x2 
+                0x08000290                UART2_write_char
+                0x080002a0                UART2_write_string
+ .text.startup  0x080002bc       0x34 Binaries/main.o
+                0x080002bc                main
  .text.Reset_Handler
-                0x080002b0       0x5c Binaries/startup.o
-                0x080002b0                Reset_Handler
- *fill*         0x0800030c       0xf4 
+                0x080002f0       0x5c Binaries/startup.o
+                0x080002f0                Reset_Handler
+ *fill*         0x0800034c       0xb4 
  .text.Default_Handler
                 0x08000400      0x100 Binaries/startup.o
                 0x08000400                DebugMon_Handler
@@ -397,41 +403,49 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
  .text.__libc_init_array
                 0x08000504       0x48 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
                 0x08000504                __libc_init_array
+ .text          0x0800054c       0x10 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strlen.o)
+                0x0800054c                strlen
  *(.text)
  *(.glue_7)
- .glue_7        0x0800054c        0x0 linker stubs
+ .glue_7        0x0800055c        0x0 linker stubs
  *(.glue_7t)
- .glue_7t       0x0800054c        0x0 linker stubs
+ .glue_7t       0x0800055c        0x0 linker stubs
  *(.eh_frame)
  *(.init)
- .init          0x0800054c        0x4 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crti.o
-                0x0800054c                _init
- .init          0x08000550        0x8 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtn.o
+ .init          0x0800055c        0x4 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crti.o
+                0x0800055c                _init
+ .init          0x08000560        0x8 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtn.o
  *(.fini)
- .fini          0x08000558        0x4 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crti.o
-                0x08000558                _fini
- .fini          0x0800055c        0x8 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtn.o
-                0x08000564                        . = ALIGN (0x4)
-                0x08000564                        _etext = .
+ .fini          0x08000568        0x4 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crti.o
+                0x08000568                _fini
+ .fini          0x0800056c        0x8 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtn.o
+                0x08000574                        . = ALIGN (0x4)
+                0x08000574                        _etext = .
 
-.vfp11_veneer   0x08000564        0x0
- .vfp11_veneer  0x08000564        0x0 linker stubs
+.vfp11_veneer   0x08000574        0x0
+ .vfp11_veneer  0x08000574        0x0 linker stubs
 
-.v4_bx          0x08000564        0x0
- .v4_bx         0x08000564        0x0 linker stubs
+.v4_bx          0x08000574        0x0
+ .v4_bx         0x08000574        0x0 linker stubs
 
-.iplt           0x08000564        0x0
- .iplt          0x08000564        0x0 Binaries/main.o
+.iplt           0x08000574        0x0
+ .iplt          0x08000574        0x0 Binaries/main.o
 
-.rel.dyn        0x08000564        0x0
- .rel.iplt      0x08000564        0x0 Binaries/main.o
-
-.rodata         0x08000564        0x0
-                0x08000564                        . = ALIGN (0x4)
+.rodata         0x08000574       0x10
+                0x08000574                        . = ALIGN (0x4)
  *(.rodata)
  *(.rodata*)
-                0x08000564                        . = ALIGN (0x4)
+ .rodata.str1.1
+                0x08000574        0xe Binaries/main.o
+                0x08000584                        . = ALIGN (0x4)
+ *fill*         0x08000582        0x2 
                 [0x00000000]                      _sidata = LOADADDR (.data)
+
+.ARM.exidx      0x08000584        0x8
+ .ARM.exidx     0x08000584        0x8 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strlen.o)
+
+.rel.dyn        0x0800058c        0x0
+ .rel.iplt      0x0800058c        0x0 Binaries/main.o
 
 .data           0x20000000        0x0 load address 0x00000000
                 0x20000000                        . = ALIGN (0x4)
@@ -479,7 +493,9 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
  .ARM.attributes
                 0x00000077       0x34 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
  .ARM.attributes
-                0x000000ab       0x22 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtn.o
+                0x000000ab       0x17 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strlen.o)
+ .ARM.attributes
+                0x000000c2       0x22 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtn.o
                 0x20000000                        __heap_base = __bss_end__
                 0x20017c00                        __heap_limit = __stack_limit
 OUTPUT(Binaries/output.elf elf32-littlearm)
@@ -494,3 +510,8 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
 
 .debug_frame    0x00000000       0x2c
  .debug_frame   0x00000000       0x2c /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+
+.debug_line_str
+                0x00000000       0xe4
+ .debug_line_str
+                0x00000000       0xe4 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strlen.o)
