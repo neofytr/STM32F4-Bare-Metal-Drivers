@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include "../Includes/STM32F401.h"
 
 #define PERIPH_BASE (0x40000000UL) // base for all the peripherals
 
@@ -14,7 +15,7 @@
 #define GPIOA_AHB1_OFFSET (0x0UL)
 #define GPIOA_BASE (AHB1_BASE + GPIOA_AHB1_OFFSET) // base for the GPIOA port configuration
 
-#define RCC_AHB1_OFFSET (0x3800UL)
+#define RCC_AHB1_OFFSET (0x3800UL) 
 #define RCC_BASE (AHB1_BASE + RCC_AHB1_OFFSET) // base of the RCC peripheral configuration
 
 // setting the bits [11:10] of the GPIOA Mode register to 01 puts the 5th pin of GPIOA into output mode
