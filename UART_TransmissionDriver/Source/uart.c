@@ -6,6 +6,11 @@ void UART2_write_string(const char *str)
     for (size_t i = 0; i < len; i++)
     {
         UART2_write_char(str[i]);
+        volatile size_t x = 0;
+        for (volatile size_t i = 0; i < 10000; i++)
+        {
+            x += i;
+        }
     }
 }
 

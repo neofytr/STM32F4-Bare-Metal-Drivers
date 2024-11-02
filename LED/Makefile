@@ -13,10 +13,10 @@ ASM = $(wildcard $(SRCDIR)/*.s)
 
 # Generate object file names
 OBJ = $(patsubst $(SRCDIR)/%.c,$(BINDIR)/%.o,$(SRC)) \
-      $(patsubst $(SRCDIR)/%.s,$(BINDIR)/%.o,$(ASM)) \
-      $(BINDIR)/startup.o \
-      $(BINDIR)/syscalls.o \
-      $(BINDIR)/sysmem.o
+$(patsubst $(SRCDIR)/%.s,$(BINDIR)/%.o,$(ASM)) \
+$(BINDIR)/startup.o \
+$(BINDIR)/syscalls.o \
+$(BINDIR)/sysmem.o
 
 # Core system files
 STARTUP = $(COREDIR)/Startup/startup.s
@@ -26,19 +26,19 @@ LINKER_SCRIPT = $(COREDIR)/LinkerScript/linker.ld
 
 # Compiler flags
 CFLAGS = -mcpu=cortex-m4 \
-         -mthumb \
-         -mfpu=fpv4-sp-d16 \
-         -mfloat-abi=hard \
-         -DSTM32F401RETx \
-         -DNUCLEO_F401RE \
-         -O2 -Os \
-         -Wall \
-         --specs=nano.specs
+	-mthumb \
+	-mfpu=fpv4-sp-d16 \
+	-mfloat-abi=hard \
+	-DSTM32F401RETx \
+	-DNUCLEO_F401RE \
+	-O2 -Os \
+	-Wall \
+	--specs=nano.specs
 
 # Linker flags
 LDFLAGS = -T$(LINKER_SCRIPT) \
-          -Wl,-Map=$(BINDIR)/output.map \
-          -Wl,--gc-sections
+	-Wl,-Map=$(BINDIR)/output.map \
+	-Wl,--gc-sections
 
 # Default target
 all: directories $(BINDIR)/output.elf $(BINDIR)/output.bin
@@ -76,5 +76,8 @@ $(BINDIR)/output.bin: $(BINDIR)/output.elf
 # Clean
 clean:
 	rm -rf $(BINDIR)
+
+flash:
+	st-flash write $(BINDIR)/output.bin 0x08000000 && st-flash reset
 
 .PHONY: all clean directories
