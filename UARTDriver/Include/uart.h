@@ -369,6 +369,98 @@ the RDR at the same time as the new (and lost) data is received. It may also
 occur when the new data is received during the reading sequence (between the USART_SR register
 read access and the USART_DR read access).
 
+For understanding the second case, see one of the comments below.
+
+## Selecting the proper oversampling method
+
+The receiver implements different user-configurable oversampling techniques (except in synchronous mode)
+for data recovery by discriminating between valid incoming data and noise.
+
+The oversampling method can be selected by programming the OVER8 bit in the USART_CR1 register
+and can be either 16 or 8 times the baud rate clock.
+
+Depending on the application:
+
+1. select oversampling by 8 (OVER8 = 1) to achieve higher speed (upto f_pclk / 8). In this
+case the maximum receiver tolerance to clock deviation is reduced.
+2. select oversampling by 16 (OVER8 = 0) to increase the tolerance of the receiver to clock
+deviations. In this case, the maximum speed is limited to maximum f_pclk / 16.
+
+After the start bit evaluation, the rest of the bits are evaluated and sampled differently.
+Programming the ONEBIT bit in the USART_CR3 register selects the method used to evaluate
+the logic level. There are two options:
+
+1. the majority vote of the three samples in the center of the received bit. In this case, when the
+3 samples used for the majority vote are not equal, the NF bit is set.
+
+2. a single sample in the center of the received bit
+
+Depending on the application:
+
+1. select the three sample's majority vote (ONEBIT = 0) when operating in a noisy environment
+and reject the data when a noise is detected because this indicates that a glitch occured during the
+sampling.
+
+2. select the single sample method (ONEBIT = 1) when the line is noise-free to increase the receiver's
+tolerance to clock deviations. In this case, the NF bit will never be set.
+
+When noise is detected in a frame:
+
+1. The NF bit is set at the rising edge of the RXNE bit.
+2. The invalid data is transferred from the Shift register to the USART_DR register.
+3. No interrupt is generated in case of single byte communication. However this bit rises
+at the same time as the RXNE bit which itself generates an interrupt.
+
+The NF bit is reset by a USART_SR register read operation followed by a USART_DR register read operation.
+
+Framing Error
+
+A framing error is detected when:
+
+The stop bit is not recognized on reception at expected time, following either a de-synchronization
+or excessive noise.
+
+When the framing error is detected:
+
+1. The FE bit is set by hardware
+2. The invalid data is transferred from the shift register to the USART_DR register.
+3. No interrupt is generated in case of single byte communication. However, this bit rises
+at the same time as RXNE bit which itself generates an interrupt.
+
+The FE bit is reset by a USART_SR register read operation followed by a USART_DR register
+read operation.
+
+The number of stop bits to be received can be configured through the control bits of Control
+register 2 -  it can be either 1 or 2 in normal mode.
+
+1. 1 stop bit: Sampling for 1 stop bit is done on the 8th, 9th and 10th (or 4th, 5th and 6th for x8) samples.
+2. 2 stop bits: Sampling for 2 stop bits is done on the 8th, 9th and 10th samples (or 4th, 5th and 6th for x8) of the first stop
+bit. If a framing error is detected during the first stop bit the FE flag will be set. The second
+stop bit is not checked for framing error. The RXNE flag will be set at the end of the first stop bit.
+
+*/
+
+/*
+
+# Fractional Baud Rate Generation
+
+The baud rate for the receiver and transmitter (Rx and Tx) are both set to the same values as
+programmed in the Mantissa and Fraction values of USARTDIV.
+
+Baud rate = f_clk / (8 * (2 - OVER8) * USARTDIV)
+
+USARTDIV is an unsigned fixed floating point number that is coded on the USART_BRR register.
+
+1. When OVER8 = 0, the fractional part is coded on 4 bits and programmed by the DIV_fraction[3:0]
+bits in the USART_BRR register.
+
+2. When OVER8 = 1, the fractional part is coded on 3 bits and programmed by the DIV_fraction[2:0]
+bits in the USART_BRR register, and bit DIV_fraction[3] must be kept cleared.
+
+The baud counters are updated to the new value in the baud registers after a write operation
+to USART_BRR. Hence the baud rate register value should not be changed during
+communication.
+
 */
 
 /*
@@ -388,5 +480,58 @@ When oversampling is enabled, the USART samples each bit at a higher rate than t
 
 The USART then uses these samples to determine the actual bit value.
 This improves reliability, as it helps to mitigate timing errors or transient noise spikes that might affect only one or two of the sampled values.
+
+Here’s a breakdown of how the two main oversampling options (8x and 16x) affect performance and tolerance:
+
+Oversampling by 8 (OVER8 = 1):
+
+The incoming signal is sampled 8 times per bit.
+This approach is ideal for applications where higher speed is desired since it allows data to be received at up to f_pclk / 8.
+However, because there are fewer samples per bit, this configuration reduces the tolerance to clock deviations or noise in the incoming signal. Small timing errors or clock mismatches may cause errors more easily than in 16x oversampling.
+Oversampling by 16 (OVER8 = 0):
+
+The signal is sampled 16 times per bit, doubling the sample count compared to the 8x configuration.
+This configuration increases the USART's tolerance to clock deviation (timing errors) because there are more samples per bit to help the USART "lock onto" the correct timing.
+The trade-off is that the maximum achievable speed is limited to f_pclk / 16, so it’s a bit slower than 8x oversampling but more robust against noise and clock inaccuracies.
+Choosing the Right Option
+Applications that prioritize speed (for example, when the data link is stable and reliable) may use oversampling by 8 to achieve higher throughput.
+Applications where timing precision is critical, such as those sensitive to clock drift or with noisy communication lines, should choose oversampling by 16 to increase reliability at a slightly lower speed.
+In summary, oversampling by 8 favors speed but sacrifices some tolerance to timing variations, while oversampling by 16 offers greater error tolerance at a lower maximum speed.
+
+*/
+
+/*
+
+# RXNE Clear when Overrun Occurs
+
+
+### Key Points in Overrun and RXNE Behavior
+
+An **overrun error (ORE)** generally occurs when the **Receive Data Register (RDR)** holds unread data (meaning **RXNE = 1**) and a new byte arrives in the shift register. In this case:
+
+1. **RXNE must be set** (indicating unread data in the RDR) for a traditional overrun error to occur because the USART couldn’t transfer new data from the shift register to RDR.
+2. The **ORE flag is set** because the new data in the shift register cannot move to RDR, so it’s discarded. This missed data signals an overrun condition.
+
+However, there is a subtle case where **RXNE could be 0 when ORE is set**:
+
+### Special Case: RXNE = 0 When ORE is Set
+
+1. **Simultaneous Reading of RDR and Shift Register Update**:
+   - When the software reads the RDR just as new data arrives, **RXNE can clear** as the data register is read.
+   - However, if new data arrives *during* this process, the shift register data cannot move to RDR because the USART’s internal processes are updating flags.
+   - This overlap can lead to an **ORE flag set with RXNE cleared** since the last byte was read right as the new byte was arriving.
+
+2. **Timing Issue**:
+   - This scenario is rare and depends on precise timing between data arrival and RDR reading. It might occur if software reads USART_SR (status register) and immediately reads USART_DR (data register) right as new data arrives.
+
+### Why Does This Happen?
+
+USART is designed to prioritize maintaining the last valid data. If software reads **USART_DR** right when new data arrives, the USART could discard the incoming byte rather than overwrite the existing data in RDR.
+
+### Practical Consideration
+
+While it’s uncommon, this behavior is documented to help developers understand cases where **ORE might be set while RXNE is unexpectedly clear**. In practice, this edge case is mostly handled by ensuring that software reads data from RDR promptly, minimizing the risk of overlap that could lead to a missed byte.
+
+**In summary**: The typical condition for ORE is indeed RXNE = 1, but in a rare timing overlap, RXNE can be 0 when ORE is set if a read occurs exactly as new data arrives.
 
 */
