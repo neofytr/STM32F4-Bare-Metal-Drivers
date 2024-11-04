@@ -70,6 +70,9 @@ byte of data. Hence, our actual data transfer rate is 11520 bytes per second, wh
 
 */
 
+// all of the following USART info is for UART single-buffer transmission / reception with
+// no hardware flow control
+
 /*
 
 Universal Synchronous Asynchronous Receiver-Transmitter (USART)
@@ -533,5 +536,87 @@ USART is designed to prioritize maintaining the last valid data. If software rea
 While it’s uncommon, this behavior is documented to help developers understand cases where **ORE might be set while RXNE is unexpectedly clear**. In practice, this edge case is mostly handled by ensuring that software reads data from RDR promptly, minimizing the risk of overlap that could lead to a missed byte.
 
 **In summary**: The typical condition for ORE is indeed RXNE = 1, but in a rare timing overlap, RXNE can be 0 when ORE is set if a read occurs exactly as new data arrives.
+
+*/
+
+/*
+
+# USART Interrupts
+
+The USART interrupt events are connected to the same interrupt vector.
+
+1. During transmission: Transmission complete, Clear to Send or Transmit Data Register empty interrupt
+2. While receiving: Idle line detection, Overrun error, Receive data register not empty,
+Parity error.
+
+These events generate an interrupt if the corresponding Enable Control Bit is set.
+
+Interrupt event         Event flag          Enable Control Bit
+
+Transmit Data
+Register Empty          TXE                 TXEIE
+
+Transmission
+Complete                TC                  TCIE
+
+Received Data
+Ready to be Read        RXNE                RXNEIE
+/ Overrun Error
+Detected                ORE                 RXNEIE
+
+Idle line detected      IDLE                IDLEIE
+
+Parity Error            PE                  PEIE
+
+Break flag              LBD                 LBDIE
+
+ */
+
+/*
+
+# Parity Control
+
+Parity control (generation of parity bit in transmission and parity checking in reception)
+can be enabled by setting the PCE bit in the USART_CR1 register. Depending on the frame
+length defined by the M bit, the possible USART frame formats are as listed:
+
+M bit    PCE bit            USART Frame
+0        0                  | SB | 8 bit data | STB |
+0        1                  | SB | 7 bit data | PB | STB |
+1        0                  | SB | 9 bit data | STB |
+1        1                  | SB | 8 bit data | PB | STB |
+
+## Even parity
+
+The parity bit is calculated to obtain an even number of 1's inside the frame made of the
+7 or 8 LSB data bits (depending on whether M is equal to 0 or 1) and the parity bit.
+
+E.g.: data=00110101; 4 bits set => parity bit will be 0 if even parity is selected (PS bit in
+USART_CR1 = 0).
+
+## Odd parity
+
+The parity bit is calculated to obtain an odd number of “1s” inside the frame made of the 7 or
+8 LSB bits (depending on whether M is equal to 0 or 1) and the parity bit.
+E.g.: data=00110101; 4 bits set => parity bit will be 1 if odd parity is selected (PS bit in
+USART_CR1 = 1).
+
+## Parity checking in reception
+
+If the parity check fails, the PE flag is set in the USART_SR register and an interrupt is
+generated if PEIE is set in the USART_CR1 register. The PE flag is cleared by a software
+sequence (a read from the status register followed by a read or write access to the
+USART_DR data register).
+
+## Parity generation in transmission
+
+If the PCE bit is set in USART_CR1, then the MSB bit of the data written in the data register
+is transmitted but is changed by the parity bit (even number of “1s” if even parity is selected
+(PS=0) or an odd number of “1s” if odd parity is selected (PS=1)).
+
+The software routine that manages the transmission can activate the software sequence
+which clears the PE flag (a read from the status register followed by a read or write access
+to the data register). When operating in half-duplex mode, depending on the software, this
+can cause the PE flag to be unexpectedly cleared.
 
 */
