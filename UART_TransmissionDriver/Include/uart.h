@@ -61,3 +61,14 @@ void UART2_write_char(char chr);
 void UART2_write_string(const char *str);
 
 #endif
+
+
+/*  
+
+We use a baud rate of 115200; this means 115200 bits are transferred per second;
+This count includes all the start, stop and parity bits;
+Since we use 1 start and 1 stop bit and no parity bit, we have a total of 10 bits for each
+byte of data. Hence, our actual data transfer rate is 11520 bytes per second, which is about
+11.5 Kilobytes per second.
+
+*/
