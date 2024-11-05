@@ -5,6 +5,7 @@
 
 .global g_pfnVectors
 .global Default_Handler
+.global USART2_Handler
 
 // Stack and memory section pointers from linker script
 .word _sidata
@@ -103,7 +104,13 @@ g_pfnVectors:
     .word SysTick_Handler
     
     // Remaining interrupt vectors
-    .rept 76
+    .rept 38
+    .word Default_Handler
+    .endr
+    
+    .word USART2_Handler
+
+    .rept 45
     .word Default_Handler
     .endr
 
@@ -134,3 +141,5 @@ SystemInit:
 .thumb_set PendSV_Handler,Default_Handler
 .weak SysTick_Handler
 .thumb_set SysTick_Handler,Default_Handler
+.weak USART2_Handler
+.thumb_set USART2_Handler,Default_Handler

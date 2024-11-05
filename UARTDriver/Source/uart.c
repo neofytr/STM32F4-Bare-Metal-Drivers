@@ -17,11 +17,63 @@
 #define TXEIE 7
 #define TCIE 6
 #define TE 3
+#define TXE 7
+#define TC 6
 
-#define SYS_CLOCK (16000000)   // default when clock tree not configured
-#define APB1_CLOCK (SYS_CLOCK) // default when clock tree not configured
+#define TRANSMISSION_BUFFER_SIZE 128
 
-#define BAUD_RATE 115200
+volatile uint8_t transmission_buffer[TRANSMISSION_BUFFER_SIZE];
+volatile uint8_t transmission_buffer_index = 0;
+volatile uint8_t transmission_buffer_length = 0;
+volatile bool transmission_buffer_busy = false;
+
+void USART2_Handler(void)
+{
+    if (IS_SET(USART2->SR, TXE)) // TXE is cleared by a write to the USART_DR
+    {
+        if (transmission_buffer_index < transmission_buffer_length)
+        {
+            USART2->DR = transmission_buffer[transmission_buffer_index++];
+        }
+        else
+        {
+            transmission_buffer_index = 0;
+            transmission_buffer_length = 0;
+            CLEAR_BIT(USART2->CR1, TXEIE);
+            transmission_buffer_busy = false;
+        }
+    }
+}
+
+uint8_t UART2_write(const char *str, uint8_t len)
+{
+    if (transmission_buffer_busy)
+    {
+        return 0;
+    }
+
+    if (len == 0 || !str)
+    {
+        return 0;
+    }
+
+    if (len > TRANSMISSION_BUFFER_SIZE)
+    {
+        return 0;
+    }
+
+    transmission_buffer_busy = true;
+    transmission_buffer_length = len;
+
+    for (uint8_t i = 0; i < len; i++)
+    {
+        transmission_buffer[i] = (uint8_t)str[i];
+    }
+
+    SET_BIT(USART2->CR1, TXEIE);
+
+    return len;
+}
 
 void UART2_TX_init(void)
 {
@@ -77,8 +129,13 @@ void UART2_TX_init(void)
     // SET_BIT(USART2->CR1, TXEIE);
 
     // for TC
-    SET_BIT(USART2->CR1, TCIE); // we clear this too when all data is transferred; we set
+    // we'll set TC in the transmission function too
+    // SET_BIT(USART2->CR1, TCIE); // we clear this too when all data is transferred; we set
     // it again in the transmission function
+
+    // enable interrupts for the USART2 peripheral in the NVIC
+
+    NVIC_EnableIRQ(USART2_IRQn);
 
     // enable the transmitter
     SET_BIT(USART2->CR1, TE);
@@ -87,4 +144,30 @@ void UART2_TX_init(void)
     // state of their control bits are zero
     // enable the USART2 module
     SET_BIT(USART2->CR1, UE_BIT);
+}
+
+#define PIN5 5
+#define LED_PIN PIN5
+
+int main(void)
+{
+    UART2_TX_init();
+
+    // set LED pin as output pin
+    SET_BIT(GPIOA->MODER, 2 * LED_PIN);
+    CLEAR_BIT(GPIOA->MODER, 2 * LED_PIN + 1);
+
+    while (true)
+    {
+        if (!UART2_write("hello\r\n", 8))
+        {
+            SET_BIT(GPIOA->ODR, LED_PIN);
+        }
+        else
+        {
+            CLEAR_BIT(GPIOA->ODR, LED_PIN);
+        }
+    }
+
+    return 0;
 }
