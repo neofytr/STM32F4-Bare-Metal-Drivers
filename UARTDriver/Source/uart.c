@@ -20,54 +20,78 @@
 #define TXE 7
 #define TC 6
 
-#define TRANSMISSION_BUFFER_SIZE 128
+#define BUFFER_SIZE 128
 
-volatile uint8_t transmission_buffer[TRANSMISSION_BUFFER_SIZE];
-volatile uint8_t transmission_buffer_index = 0;
-volatile uint8_t transmission_buffer_length = 0;
-volatile bool transmission_buffer_busy = false;
+volatile uint8_t buffer[BUFFER_SIZE];
+volatile uint8_t buffer_index = 0;
+volatile uint8_t buffer_length = 0;
+volatile bool buffer_busy = false;
 
 void USART2_Handler(void)
 {
     if (IS_SET(USART2->SR, TXE)) // TXE is cleared by a write to the USART_DR
     {
-        if (transmission_buffer_index < transmission_buffer_length)
+        if (buffer_index < buffer_length)
         {
-            USART2->DR = transmission_buffer[transmission_buffer_index++];
+            USART2->DR = buffer[buffer_index++];
         }
         else
         {
-            transmission_buffer_index = 0;
-            transmission_buffer_length = 0;
+            buffer_index = 0;
+            buffer_length = 0;
             CLEAR_BIT(USART2->CR1, TXEIE);
-            transmission_buffer_busy = false;
+            buffer_busy = false;
         }
     }
 }
 
-uint8_t UART2_write(const char *str, uint8_t len)
+uint8_t UART2_read(char *str, uint8_t len)
 {
-    if (transmission_buffer_busy)
+    if (buffer_busy)
     {
         return 0;
     }
 
-    if (len == 0 || !str)
+    if (len == 0 || !str || len > BUFFER_SIZE)
     {
         return 0;
     }
 
-    if (len > TRANSMISSION_BUFFER_SIZE)
+    buffer_busy = true;
+
+    if (len > buffer_length)
     {
+        buffer_busy = false;
         return 0;
     }
-
-    transmission_buffer_busy = true;
-    transmission_buffer_length = len;
 
     for (uint8_t i = 0; i < len; i++)
     {
-        transmission_buffer[i] = (uint8_t)str[i];
+        str[i] = buffer[buffer_length - len + i];
+    }
+
+    buffer_busy = false;
+    return len;
+}
+
+uint8_t UART2_write(const char *str, uint8_t len)
+{
+    if (buffer_busy)
+    {
+        return 0;
+    }
+
+    if (len == 0 || !str || len > BUFFER_SIZE)
+    {
+        return 0;
+    }
+
+    buffer_busy = true;
+    buffer_length = len;
+
+    for (uint8_t i = 0; i < len; i++)
+    {
+        buffer[i] = (uint8_t)str[i];
     }
 
     SET_BIT(USART2->CR1, TXEIE);
@@ -75,7 +99,7 @@ uint8_t UART2_write(const char *str, uint8_t len)
     return len;
 }
 
-void UART2_TX_init(void)
+void UART2_init(void)
 {
     // GPIOA config
 

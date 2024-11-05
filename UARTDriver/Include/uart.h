@@ -40,8 +40,9 @@ and parity is checked on the received data */
 #define ALL_CLEAR(reg) (reg &= 0x0)
 #define IS_SET(reg, bit) ((reg) & (1UL << (bit)))
 
-void UART2_TX_init(void);
+void UART2_init(void);
 uint8_t UART2_write(const char *str, uint8_t len);
+uint8_t UART2_read(char *str, uint8_t len);
 
 #endif
 
