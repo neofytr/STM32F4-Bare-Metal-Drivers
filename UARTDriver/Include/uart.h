@@ -54,7 +54,7 @@ and parity is checked on the received data */
 #define ALL_CLEAR(reg) (reg &= 0x0)
 #define READ_BIT(reg, bit) ((reg) & (1UL << (bit)))
 
-void UART2_tx_init(void);
+void UART2_TX_init(void);
 void UART2_write_char(char chr);
 void UART2_write_string(const char *str);
 
@@ -127,7 +127,7 @@ Through these pins, serial data is transmitted and received in normal USART mode
 5. This interface uses a fractional baud rate generator - with a 12-bit mantissa and 4-bit fraction
 6. A status register (USART_SR)
 7. Data register (USART_DR)
-8. A baud rate register (USART_BRR) - 12-bit mantissa and 4-bit fractionuu
+8. A baud rate register (USART_BRR) - 12-bit mantissa and 4-bit fraction
 
 Word length may be selected as being either 8 bits or 9 bits by programming the M bit in the
 USART_CR1 register.
