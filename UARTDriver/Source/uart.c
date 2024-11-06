@@ -1,6 +1,6 @@
 #include "../Include/uart.h"
 
-// Pin and bit definitions
+// pin and bit definitions
 #define UE_BIT 13
 #define M_BIT 12
 #define STOP_BIT 12
@@ -20,7 +20,7 @@
 #define RXNEIE 5
 #define TC 6
 
-// Buffer configurations
+// buffer configurations
 #define TX_BUFFER_SIZE 128
 #define RX_BUFFER_SIZE 128
 
@@ -41,11 +41,11 @@ typedef struct
     volatile uint8_t read_index;
 } RxBuffer;
 
-// Global buffer instances
+// global buffer instances
 static TxBuffer tx_buffer = {0};
 static RxBuffer rx_buffer = {0};
 
-// Buffer management functions
+// buffer management functions
 static bool tx_buffer_is_busy(void)
 {
     return tx_buffer.busy;
@@ -107,10 +107,8 @@ static bool rx_buffer_read(uint8_t *data)
     return true;
 }
 
-// UART interrupt handler
 void USART2_Handler(void)
 {
-    // Handle TX
     if (IS_SET(USART2->SR, TXE))
     {
         if (tx_buffer.index < tx_buffer.length)
@@ -121,7 +119,7 @@ void USART2_Handler(void)
         {
             while (!IS_SET(USART2->SR, TC))
             {
-                // Wait for transmission complete
+                // wait for transmission complete
             }
 
             tx_buffer_reset();
@@ -130,18 +128,16 @@ void USART2_Handler(void)
         }
     }
 
-    // Handle RX
     if (IS_SET(USART2->SR, RXNE))
     {
         uint8_t received_data = USART2->DR; // i dont check the receive errors since this is a general driver and i dont have any specific thing in mind according to the application which will force me to do certain things when certain errors arise
         if (!rx_buffer_write(received_data))
         {
-            // Buffer full - data is discarded
+            // buffer full - data is discarded
         }
     }
 }
 
-// Public UART functions
 uint8_t UART2_write(const char *str, uint8_t len)
 {
     if (!tx_buffer_write(str, len))
@@ -154,9 +150,28 @@ uint8_t UART2_write(const char *str, uint8_t len)
     return len;
 }
 
-bool UART2_read(uint8_t *data)
+bool UART2_write_byte(const char *str)
+{
+    return UART2_write(str, 1);
+}
+
+bool UART2_read_byte(uint8_t *data)
 {
     return rx_buffer_read(data);
+}
+
+uint8_t UART2_read(uint8_t *data, uint8_t len)
+{
+    uint8_t actual_read = 0;
+    for (uint8_t i = 0; i < len; i++)
+    {
+        if (UART2_read_byte(&(data[actual_read])))
+        {
+            actual_read++;
+        }
+    }
+
+    return actual_read;
 }
 
 void UART2_init(void)
@@ -208,7 +223,6 @@ void UART2_init(void)
     SET_BIT(USART2->CR1, UE_BIT);
 }
 
-// Example main function
 #define PIN5 5
 #define LED_PIN PIN5
 
@@ -216,21 +230,20 @@ int main(void)
 {
     UART2_init();
 
-    // Configure LED pin
+    // configure LED pin
     SET_BIT(GPIOA->MODER, 2 * LED_PIN);
     CLEAR_BIT(GPIOA->MODER, 2 * LED_PIN + 1);
 
     uint8_t received_byte;
     while (true)
     {
-        if (UART2_read(&received_byte))
+        if (UART2_read(&received_byte, 1) == 1)
         {
             char echo_byte = received_byte + 1;
 
-            // Try to echo until successful
-            while (UART2_write(&echo_byte, 1) == 0)
+            // try to echo until successful
+            while (!UART2_write_byte(&echo_byte))
             {
-                // Optional: Could add a timeout here
             }
         }
     }

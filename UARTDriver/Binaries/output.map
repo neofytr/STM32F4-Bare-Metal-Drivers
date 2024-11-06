@@ -367,17 +367,19 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
 .text           0x08000200      0x464
                 0x08000200                        . = ALIGN (0x4)
  *(.text*)
- .text          0x08000200      0x1c8 Binaries/uart.o
-                0x08000200                USART2_Handler
-                0x08000280                UART2_write
-                0x080002d4                UART2_init
- .text.startup  0x080003c8       0x5c Binaries/uart.o
-                0x080003c8                main
- *fill*         0x08000424        0xc 
+ .text          0x08000200      0x24c Binaries/uart.o
+                0x08000234                USART2_Handler
+                0x080002c8                UART2_write
+                0x08000324                UART2_write_byte
+                0x08000334                UART2_read_byte
+                0x08000336                UART2_read
+                0x08000358                UART2_init
+ .text.startup  0x0800044c       0x44 Binaries/uart.o
+                0x0800044c                main
  .text.Reset_Handler
-                0x08000430       0x5c Binaries/startup.o
-                0x08000430                Reset_Handler
- *fill*         0x0800048c       0x74 
+                0x08000490       0x5c Binaries/startup.o
+                0x08000490                Reset_Handler
+ *fill*         0x080004ec       0x14 
  .text.Default_Handler
                 0x08000500      0x100 Binaries/startup.o
                 0x08000500                DebugMon_Handler
@@ -449,13 +451,6 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
                 0x20000000                        __bss_start__ = .
  *(.bss)
  .bss           0x20000000      0x105 Binaries/uart.o
-                0x20000000                buffer_index
-                0x20000001                buffer_length
-                0x20000002                buffer
-                0x20000082                buffer_busy
-                0x20000083                rx_write_index
-                0x20000084                rx_read_index
-                0x20000085                rx_buffer
  *(.bss*)
  *(COMMON)
                 0x20000108                        . = ALIGN (0x4)
