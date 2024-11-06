@@ -373,14 +373,14 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
  *(.text*)
  .text.startup  0x08000200       0x7c Binaries/main.o
                 0x08000200                main
- .text          0x0800027c      0x24c Binaries/uart.o
+ .text          0x0800027c      0x248 Binaries/uart.o
                 0x080002b0                USART2_Handler
-                0x08000344                UART2_write
-                0x080003a0                UART2_write_byte
-                0x080003b0                UART2_read_byte
-                0x080003b2                UART2_read
-                0x080003d4                UART2_init
- *fill*         0x080004c8        0x8 
+                0x08000338                UART2_write
+                0x0800039c                UART2_write_byte
+                0x080003ac                UART2_read_byte
+                0x080003ae                UART2_read
+                0x080003d0                UART2_init
+ *fill*         0x080004c4        0xc 
  .text.Reset_Handler
                 0x080004d0       0x5c Binaries/startup.o
                 0x080004d0                Reset_Handler
@@ -454,20 +454,20 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
 .igot.plt       0x20000000        0x0
  .igot.plt      0x20000000        0x0 Binaries/main.o
 
-.bss            0x20000000      0x108
+.bss            0x20000000      0x104
                 0x20000000                        . = ALIGN (0x4)
                 0x20000000                        __bss_start__ = .
  *(.bss)
- .bss           0x20000000      0x105 Binaries/uart.o
+ .bss           0x20000000      0x104 Binaries/uart.o
  *(.bss*)
  *(COMMON)
-                0x20000108                        . = ALIGN (0x4)
- *fill*         0x20000105        0x3 
-                0x20000108                        __bss_end__ = .
+                0x20000104                        . = ALIGN (0x4)
+                0x20000104                        __bss_end__ = .
 
 ._user_heap_stack
-                0x20000108      0x600
+                0x20000104      0x604
                 0x20000108                        . = ALIGN (0x8)
+ *fill*         0x20000104        0x4 
                 0x20000308                        . = (. + __Min_Heap_Size)
  *fill*         0x20000108      0x200 
                 0x20000708                        . = (. + __Min_Stack_Size)
@@ -494,7 +494,7 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
                 0x000000ab       0x34 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
  .ARM.attributes
                 0x000000df       0x22 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtn.o
-                0x20000108                        __heap_base = __bss_end__
+                0x20000104                        __heap_base = __bss_end__
                 0x20017c00                        __heap_limit = __stack_limit
 OUTPUT(Binaries/output.elf elf32-littlearm)
 LOAD linker stubs

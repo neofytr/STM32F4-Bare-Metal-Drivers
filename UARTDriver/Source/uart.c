@@ -28,9 +28,8 @@
 typedef struct
 {
     volatile uint8_t data[TX_BUFFER_SIZE];
-    volatile uint8_t index;
-    volatile uint8_t length;
-    volatile bool busy;
+    volatile uint8_t write_index;
+    volatile uint8_t read_index;
 } TxBuffer;
 
 // RX Buffer structure
@@ -46,35 +45,31 @@ static TxBuffer tx_buffer = {0};
 static RxBuffer rx_buffer = {0};
 
 // buffer management functions
-static bool tx_buffer_is_busy(void)
+static bool tx_buffer_is_full(void)
 {
-    return tx_buffer.busy;
+    uint8_t next_write = (tx_buffer.write_index + 1) & (TX_BUFFER_SIZE - 1);
+    return (tx_buffer.read_index == next_write);
 }
 
-static bool tx_buffer_write(const char *str, uint8_t len)
+static uint8_t tx_buffer_write(const char *str, uint8_t len)
 {
-    if (tx_buffer_is_busy() || !str || len == 0 || len > TX_BUFFER_SIZE)
+    if (!str || len == 0 || len > TX_BUFFER_SIZE)
     {
-        return false;
+        return 0;
     }
 
-    tx_buffer.busy = true;
-    tx_buffer.length = len;
-    tx_buffer.index = 0;
+    uint8_t actual_written = 0;
+    uint8_t current_write_index;
 
-    for (uint8_t i = 0; i < len; i++)
+    while (!tx_buffer_is_full() && actual_written < len) // we constantly use the new values to check since data may be going out of the buffer as we are adding to it
     {
-        tx_buffer.data[i] = (uint8_t)str[i];
+        current_write_index = tx_buffer.write_index;
+        tx_buffer.data[current_write_index] = (uint8_t)str[actual_written];
+        actual_written++;
+        tx_buffer.write_index = (current_write_index + 1) & (TX_BUFFER_SIZE - 1);
     }
 
-    return true;
-}
-
-static void tx_buffer_reset(void)
-{
-    tx_buffer.index = 0;
-    tx_buffer.length = 0;
-    tx_buffer.busy = false;
+    return actual_written;
 }
 
 static bool rx_buffer_is_full(void)
@@ -111,9 +106,11 @@ void USART2_Handler(void)
 {
     if (IS_SET(USART2->SR, TXE))
     {
-        if (tx_buffer.index < tx_buffer.length)
+        if (tx_buffer.read_index != tx_buffer.write_index)
         {
-            USART2->DR = tx_buffer.data[tx_buffer.index++];
+            uint8_t current_read_index = tx_buffer.read_index;
+            USART2->DR = tx_buffer.data[current_read_index];
+            tx_buffer.read_index = (current_read_index + 1) & (TX_BUFFER_SIZE - 1);
         }
         else
         {
@@ -122,7 +119,6 @@ void USART2_Handler(void)
                 // wait for transmission complete
             }
 
-            tx_buffer_reset();
             CLEAR_BIT(USART2->CR1, TXEIE);
             CLEAR_BIT(USART2->CR1, TCIE);
         }
@@ -140,14 +136,11 @@ void USART2_Handler(void)
 
 uint8_t UART2_write(const char *str, uint8_t len)
 {
-    if (!tx_buffer_write(str, len))
-    {
-        return 0;
-    }
-
+    uint8_t return_val = tx_buffer_write(str, len);
+    // Enable TX interrupts
     SET_BIT(USART2->CR1, TXEIE);
     SET_BIT(USART2->CR1, TCIE);
-    return len;
+    return return_val;
 }
 
 bool UART2_write_byte(const char *str)
