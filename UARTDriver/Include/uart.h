@@ -42,7 +42,7 @@ and parity is checked on the received data */
 
 void UART2_init(void);
 uint8_t UART2_write(const char *str, uint8_t len);
-uint8_t UART2_read(uint8_t *data);
+bool UART2_read(uint8_t *data);
 
 #endif
 
