@@ -133,7 +133,7 @@ void USART2_Handler(void)
     // Handle RX
     if (IS_SET(USART2->SR, RXNE))
     {
-        uint8_t received_data = USART2->DR;
+        uint8_t received_data = USART2->DR; // i dont check the receive errors since this is a general driver and i dont have any specific thing in mind according to the application which will force me to do certain things when certain errors arise
         if (!rx_buffer_write(received_data))
         {
             // Buffer full - data is discarded
