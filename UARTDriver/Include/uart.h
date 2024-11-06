@@ -39,6 +39,7 @@ and parity is checked on the received data */
 #define CLEAR_BIT(reg, bit) ((reg) &= ~(1UL << (bit)))
 #define ALL_CLEAR(reg) (reg &= 0x0)
 #define IS_SET(reg, bit) ((reg) & (1UL << (bit)))
+#define TOGGLE_PIN(reg, bit) ((reg) ^= (1UL << (bit)))
 
 void UART2_init(void);
 

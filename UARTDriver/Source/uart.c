@@ -222,31 +222,3 @@ void UART2_init(void)
     // Enable USART2 module
     SET_BIT(USART2->CR1, UE_BIT);
 }
-
-#define PIN5 5
-#define LED_PIN PIN5
-
-int main(void)
-{
-    UART2_init();
-
-    // configure LED pin
-    SET_BIT(GPIOA->MODER, 2 * LED_PIN);
-    CLEAR_BIT(GPIOA->MODER, 2 * LED_PIN + 1);
-
-    uint8_t received_byte;
-    while (true)
-    {
-        if (UART2_read(&received_byte, 1) == 1)
-        {
-            char echo_byte = received_byte + 1;
-
-            // try to echo until successful
-            while (!UART2_write_byte(&echo_byte))
-            {
-            }
-        }
-    }
-
-    return 0;
-}

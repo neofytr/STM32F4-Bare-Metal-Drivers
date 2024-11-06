@@ -78,6 +78,9 @@ Discarded input sections
                 0x00000000       0xcf /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/crt0.o
  .ARM.attributes
                 0x00000000       0x20 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/crt0.o
+ .text          0x00000000        0x0 Binaries/main.o
+ .data          0x00000000        0x0 Binaries/main.o
+ .bss           0x00000000        0x0 Binaries/main.o
  .data          0x00000000        0x0 Binaries/uart.o
  .text          0x00000000       0x20 Binaries/startup.o
  .data          0x00000000        0x0 Binaries/startup.o
@@ -337,6 +340,7 @@ Linker script and memory map
 LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crti.o
 LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtbegin.o
 LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/crt0.o
+LOAD Binaries/main.o
 LOAD Binaries/uart.o
 LOAD Binaries/startup.o
 LOAD Binaries/syscalls.o
@@ -364,76 +368,80 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
                 0x08000000                g_pfnVectors
                 0x08000190                        . = ALIGN (0x4)
 
-.text           0x08000200      0x464
+.text           0x08000200      0x564
                 0x08000200                        . = ALIGN (0x4)
  *(.text*)
- .text          0x08000200      0x24c Binaries/uart.o
-                0x08000234                USART2_Handler
-                0x080002c8                UART2_write
-                0x08000324                UART2_write_byte
-                0x08000334                UART2_read_byte
-                0x08000336                UART2_read
-                0x08000358                UART2_init
- .text.startup  0x0800044c       0x44 Binaries/uart.o
-                0x0800044c                main
+ .text.startup  0x08000200       0x7c Binaries/main.o
+                0x08000200                main
+ .text          0x0800027c      0x24c Binaries/uart.o
+                0x080002b0                USART2_Handler
+                0x08000344                UART2_write
+                0x080003a0                UART2_write_byte
+                0x080003b0                UART2_read_byte
+                0x080003b2                UART2_read
+                0x080003d4                UART2_init
+ *fill*         0x080004c8        0x8 
  .text.Reset_Handler
-                0x08000490       0x5c Binaries/startup.o
-                0x08000490                Reset_Handler
- *fill*         0x080004ec       0x14 
+                0x080004d0       0x5c Binaries/startup.o
+                0x080004d0                Reset_Handler
+ *fill*         0x0800052c       0xd4 
  .text.Default_Handler
-                0x08000500      0x100 Binaries/startup.o
-                0x08000500                DebugMon_Handler
-                0x08000500                HardFault_Handler
-                0x08000500                SysTick_Handler
-                0x08000500                PendSV_Handler
-                0x08000500                NMI_Handler
-                0x08000500                UsageFault_Handler
-                0x08000500                Default_Handler
-                0x08000500                MemManage_Handler
-                0x08000500                SVC_Handler
-                0x08000500                BusFault_Handler
+                0x08000600      0x100 Binaries/startup.o
+                0x08000600                DebugMon_Handler
+                0x08000600                HardFault_Handler
+                0x08000600                SysTick_Handler
+                0x08000600                PendSV_Handler
+                0x08000600                NMI_Handler
+                0x08000600                UsageFault_Handler
+                0x08000600                Default_Handler
+                0x08000600                MemManage_Handler
+                0x08000600                SVC_Handler
+                0x08000600                BusFault_Handler
  .text.SystemInit
-                0x08000600        0x2 Binaries/startup.o
-                0x08000600                SystemInit
- *fill*         0x08000602        0x2 
+                0x08000700        0x2 Binaries/startup.o
+                0x08000700                SystemInit
+ *fill*         0x08000702        0x2 
  .text.__libc_init_array
-                0x08000604       0x48 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
-                0x08000604                __libc_init_array
+                0x08000704       0x48 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+                0x08000704                __libc_init_array
  *(.text)
  *(.glue_7)
- .glue_7        0x0800064c        0x0 linker stubs
+ .glue_7        0x0800074c        0x0 linker stubs
  *(.glue_7t)
- .glue_7t       0x0800064c        0x0 linker stubs
+ .glue_7t       0x0800074c        0x0 linker stubs
  *(.eh_frame)
  *(.init)
- .init          0x0800064c        0x4 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crti.o
-                0x0800064c                _init
- .init          0x08000650        0x8 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtn.o
+ .init          0x0800074c        0x4 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crti.o
+                0x0800074c                _init
+ .init          0x08000750        0x8 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtn.o
  *(.fini)
- .fini          0x08000658        0x4 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crti.o
-                0x08000658                _fini
- .fini          0x0800065c        0x8 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtn.o
-                0x08000664                        . = ALIGN (0x4)
-                0x08000664                        _etext = .
+ .fini          0x08000758        0x4 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crti.o
+                0x08000758                _fini
+ .fini          0x0800075c        0x8 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtn.o
+                0x08000764                        . = ALIGN (0x4)
+                0x08000764                        _etext = .
 
-.vfp11_veneer   0x08000664        0x0
- .vfp11_veneer  0x08000664        0x0 linker stubs
+.vfp11_veneer   0x08000764        0x0
+ .vfp11_veneer  0x08000764        0x0 linker stubs
 
-.v4_bx          0x08000664        0x0
- .v4_bx         0x08000664        0x0 linker stubs
+.v4_bx          0x08000764        0x0
+ .v4_bx         0x08000764        0x0 linker stubs
 
-.iplt           0x08000664        0x0
- .iplt          0x08000664        0x0 Binaries/uart.o
+.iplt           0x08000764        0x0
+ .iplt          0x08000764        0x0 Binaries/main.o
 
-.rel.dyn        0x08000664        0x0
- .rel.iplt      0x08000664        0x0 Binaries/uart.o
-
-.rodata         0x08000664        0x0
-                0x08000664                        . = ALIGN (0x4)
+.rodata         0x08000764       0x14
+                0x08000764                        . = ALIGN (0x4)
  *(.rodata)
  *(.rodata*)
-                0x08000664                        . = ALIGN (0x4)
+ .rodata.str1.1
+                0x08000764       0x11 Binaries/main.o
+                0x08000778                        . = ALIGN (0x4)
+ *fill*         0x08000775        0x3 
                 [0x00000000]                      _sidata = LOADADDR (.data)
+
+.rel.dyn        0x08000778        0x0
+ .rel.iplt      0x08000778        0x0 Binaries/main.o
 
 .data           0x20000000        0x0 load address 0x00000000
                 0x20000000                        . = ALIGN (0x4)
@@ -444,7 +452,7 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
                 0x20000000                        _edata = .
 
 .igot.plt       0x20000000        0x0
- .igot.plt      0x20000000        0x0 Binaries/uart.o
+ .igot.plt      0x20000000        0x0 Binaries/main.o
 
 .bss            0x20000000      0x108
                 0x20000000                        . = ALIGN (0x4)
@@ -477,13 +485,15 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
  .ARM.attributes
                 0x00000000       0x22 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crti.o
  .ARM.attributes
-                0x00000022       0x34 Binaries/uart.o
+                0x00000022       0x34 Binaries/main.o
  .ARM.attributes
-                0x00000056       0x21 Binaries/startup.o
+                0x00000056       0x34 Binaries/uart.o
  .ARM.attributes
-                0x00000077       0x34 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+                0x0000008a       0x21 Binaries/startup.o
  .ARM.attributes
-                0x000000ab       0x22 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtn.o
+                0x000000ab       0x34 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+ .ARM.attributes
+                0x000000df       0x22 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtn.o
                 0x20000108                        __heap_base = __bss_end__
                 0x20017c00                        __heap_limit = __stack_limit
 OUTPUT(Binaries/output.elf elf32-littlearm)
@@ -493,8 +503,9 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-
 LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/libgcc.a
 
 .comment        0x00000000       0x45
- .comment       0x00000000       0x45 Binaries/uart.o
+ .comment       0x00000000       0x45 Binaries/main.o
                                  0x46 (size before relaxing)
+ .comment       0x00000045       0x46 Binaries/uart.o
 
 .debug_frame    0x00000000       0x2c
  .debug_frame   0x00000000       0x2c /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
