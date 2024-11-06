@@ -17,7 +17,10 @@
 #define TXEIE 7
 #define TCIE 6
 #define TE 3
+#define RE 2
 #define TXE 7
+#define RXNE 5
+#define RXNEIE 5
 #define TC 6
 
 #define BUFFER_SIZE 128
@@ -26,6 +29,11 @@ volatile uint8_t buffer[BUFFER_SIZE];
 volatile uint8_t buffer_index = 0;
 volatile uint8_t buffer_length = 0;
 volatile bool buffer_busy = false;
+
+#define RX_BUFFER_SIZE 128
+volatile uint8_t rx_buffer[RX_BUFFER_SIZE];
+volatile uint8_t rx_write_index = 0;
+volatile uint8_t rx_read_index = 0;
 
 void USART2_Handler(void)
 {
@@ -37,41 +45,32 @@ void USART2_Handler(void)
         }
         else
         {
+            while (!IS_SET(USART2->SR, TC))
+            {
+            }
+
             buffer_index = 0;
             buffer_length = 0;
             CLEAR_BIT(USART2->CR1, TXEIE);
+            CLEAR_BIT(USART2->CR1, TCIE);
             buffer_busy = false;
         }
     }
-}
 
-uint8_t UART2_read(char *str, uint8_t len)
-{
-    if (buffer_busy)
+    if (IS_SET(USART2->SR, RXNE))
     {
-        return 0;
+        uint8_t next_write = (rx_write_index + 1) % RX_BUFFER_SIZE;
+        if (next_write != rx_read_index) // Buffer not full
+        {
+            rx_buffer[rx_write_index] = USART2->DR;
+            rx_write_index = next_write;
+        }
+        else
+        {
+            // Buffer full - read DR to clear RXNE flag but discard data
+            (void)USART2->DR;
+        }
     }
-
-    if (len == 0 || !str || len > BUFFER_SIZE)
-    {
-        return 0;
-    }
-
-    buffer_busy = true;
-
-    if (len > buffer_length)
-    {
-        buffer_busy = false;
-        return 0;
-    }
-
-    for (uint8_t i = 0; i < len; i++)
-    {
-        str[i] = buffer[buffer_length - len + i];
-    }
-
-    buffer_busy = false;
-    return len;
 }
 
 uint8_t UART2_write(const char *str, uint8_t len)
@@ -95,6 +94,7 @@ uint8_t UART2_write(const char *str, uint8_t len)
     }
 
     SET_BIT(USART2->CR1, TXEIE);
+    SET_BIT(USART2->CR1, TCIE);
 
     return len;
 }
@@ -115,6 +115,19 @@ void UART2_init(void)
     SET_BIT(GPIOA->AFR[0], TX_PIN * 4 + 1);
     SET_BIT(GPIOA->AFR[0], TX_PIN * 4 + 2);
     CLEAR_BIT(GPIOA->AFR[0], TX_PIN * 4 + 3);
+
+    // set the RX_PIN into AF mode
+    CLEAR_BIT(GPIOA->MODER, RX_PIN * 2);
+    SET_BIT(GPIOA->MODER, RX_PIN * 2 + 1);
+
+    // set the RX_PIN into AF07
+    SET_BIT(GPIOA->AFR[0], RX_PIN * 4);
+    SET_BIT(GPIOA->AFR[0], RX_PIN * 4 + 1);
+    SET_BIT(GPIOA->AFR[0], RX_PIN * 4 + 2);
+    CLEAR_BIT(GPIOA->AFR[0], RX_PIN * 4 + 3);
+
+    SET_BIT(GPIOA->PUPDR, RX_PIN * 2);
+    CLEAR_BIT(GPIOA->PUPDR, RX_PIN * 2 + 1);
 
     // USART2 config
 
@@ -157,12 +170,18 @@ void UART2_init(void)
     // SET_BIT(USART2->CR1, TCIE); // we clear this too when all data is transferred; we set
     // it again in the transmission function
 
+    // enable the receive interrupt so that we get notified as soon as we get data
+    SET_BIT(USART2->CR1, RXNEIE);
+
     // enable interrupts for the USART2 peripheral in the NVIC
 
     NVIC_EnableIRQ(USART2_IRQn);
 
     // enable the transmitter
     SET_BIT(USART2->CR1, TE);
+
+    // enable the receiver
+    SET_BIT(USART2->CR1, RE);
 
     // all the other features will be turned off since the reset
     // state of their control bits are zero
@@ -175,7 +194,7 @@ void UART2_init(void)
 
 int main(void)
 {
-    UART2_TX_init();
+    UART2_init();
 
     // set LED pin as output pin
     SET_BIT(GPIOA->MODER, 2 * LED_PIN);
@@ -183,13 +202,16 @@ int main(void)
 
     while (true)
     {
-        if (!UART2_write("hello\r\n", 8))
+        while (rx_read_index != rx_write_index)
         {
-            SET_BIT(GPIOA->ODR, LED_PIN);
-        }
-        else
-        {
-            CLEAR_BIT(GPIOA->ODR, LED_PIN);
+            char byte = rx_buffer[rx_read_index] + 1;
+            rx_read_index = (rx_read_index + 1) % RX_BUFFER_SIZE;
+
+            // Try to echo until successful
+            while (UART2_write(&byte, 1) == 0)
+            {
+                // Optional: Could add a timeout here
+            }
         }
     }
 
