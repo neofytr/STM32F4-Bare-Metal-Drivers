@@ -21,6 +21,14 @@ _estack = __RAM_END;
 
 SECTIONS
 {
+    /* Bootloader Section */
+    _bootloader_ :
+    {
+        . = ALIGN(4);              /* Align to 4 bytes */
+        KEEP(*(_bootloader_))       /* Ensure the bootloader is kept */
+        . = ALIGN(4);
+    } >FLASH
+
     /* Vector Table */
     .isr_vector :
     {

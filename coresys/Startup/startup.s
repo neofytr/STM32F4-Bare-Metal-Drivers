@@ -14,6 +14,9 @@
 .word __bss_start__
 .word __bss_end__
 
+.section _bootloader_
+.incbin "/home/raj/Desktop/STM32Drivers/coresys/bootloader/bootloader.bin"
+
 // Ensure proper alignment for all sections
 .align 4
 .section .text.Reset_Handler
