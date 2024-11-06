@@ -42,7 +42,7 @@ and parity is checked on the received data */
 
 void UART2_init(void);
 uint8_t UART2_write(const char *str, uint8_t len);
-uint8_t UART2_read(char *str, uint8_t len);
+uint8_t UART2_read(uint8_t *data);
 
 #endif
 
@@ -604,5 +604,42 @@ The software routine that manages the transmission can activate the software seq
 which clears the PE flag (a read from the status register followed by a read or write access
 to the data register). When operating in half-duplex mode, depending on the software, this
 can cause the PE flag to be unexpectedly cleared.
+
+*/
+
+/*
+
+# Errors upon data receival
+
+Here's a breakdown of the UART error bits and their meanings:
+
+1. Parity Error (PE):
+   - Set when the parity check fails
+   - Indicates possible data corruption
+   - Data is still available but might be incorrect
+
+2. Framing Error (FE):
+   - Set when the stop bit is not detected correctly
+   - Usually indicates wrong baud rate configuration
+   - Can also indicate line noise or disconnection
+
+3. Noise Error (NE):
+   - Set when noise is detected on the received data line
+   - Data might still be valid but should be treated as suspicious
+   - More common in noisy environments or with long cable runs
+
+4. Overrun Error (ORE):
+   - Set when a new byte arrives before the previous one was read
+   - Indicates that data has been lost
+   - Common when the processing speed can't keep up with data arrival
+
+Important notes about error handling:
+
+1. Reading the DR (Data Register) clears the error flags
+2. Error flags should be checked before reading the data
+3. Multiple errors can occur simultaneously
+4. The RXNE (Receiver Not Empty) flag is set even if an error occurs
+5. You can enable interrupt generation for these errors using the EIE bit in CR3
+
 
 */

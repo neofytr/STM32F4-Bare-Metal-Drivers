@@ -1,14 +1,11 @@
 #include "../Include/uart.h"
 
-// USART2 uses PA2 configured in AF07 as it's TX pin
-
+// Pin and bit definitions
 #define UE_BIT 13
 #define M_BIT 12
 #define STOP_BIT 12
-
 #define TX_PIN 2
 #define RX_PIN 3
-
 #define GPIOA_EN 0
 #define USART2_EN 17
 #define OVER8 15
@@ -23,172 +20,195 @@
 #define RXNEIE 5
 #define TC 6
 
-#define BUFFER_SIZE 128
-
-volatile uint8_t buffer[BUFFER_SIZE];
-volatile uint8_t buffer_index = 0;
-volatile uint8_t buffer_length = 0;
-volatile bool buffer_busy = false;
-
+// Buffer configurations
+#define TX_BUFFER_SIZE 128
 #define RX_BUFFER_SIZE 128
-volatile uint8_t rx_buffer[RX_BUFFER_SIZE];
-volatile uint8_t rx_write_index = 0;
-volatile uint8_t rx_read_index = 0;
 
+// TX Buffer structure
+typedef struct
+{
+    volatile uint8_t data[TX_BUFFER_SIZE];
+    volatile uint8_t index;
+    volatile uint8_t length;
+    volatile bool busy;
+} TxBuffer;
+
+// RX Buffer structure
+typedef struct
+{
+    volatile uint8_t data[RX_BUFFER_SIZE];
+    volatile uint8_t write_index;
+    volatile uint8_t read_index;
+} RxBuffer;
+
+// Global buffer instances
+static TxBuffer tx_buffer = {0};
+static RxBuffer rx_buffer = {0};
+
+// Buffer management functions
+static bool tx_buffer_is_busy(void)
+{
+    return tx_buffer.busy;
+}
+
+static bool tx_buffer_write(const char *str, uint8_t len)
+{
+    if (tx_buffer_is_busy() || !str || len == 0 || len > TX_BUFFER_SIZE)
+    {
+        return false;
+    }
+
+    tx_buffer.busy = true;
+    tx_buffer.length = len;
+    tx_buffer.index = 0;
+
+    for (uint8_t i = 0; i < len; i++)
+    {
+        tx_buffer.data[i] = (uint8_t)str[i];
+    }
+
+    return true;
+}
+
+static void tx_buffer_reset(void)
+{
+    tx_buffer.index = 0;
+    tx_buffer.length = 0;
+    tx_buffer.busy = false;
+}
+
+static bool rx_buffer_is_full(void)
+{
+    uint8_t next_write = (rx_buffer.write_index + 1) & (RX_BUFFER_SIZE - 1);
+    return next_write == rx_buffer.read_index;
+}
+
+static bool rx_buffer_write(uint8_t data)
+{
+    if (rx_buffer_is_full())
+    {
+        return false;
+    }
+
+    rx_buffer.data[rx_buffer.write_index] = data;
+    rx_buffer.write_index = (rx_buffer.write_index + 1) & (RX_BUFFER_SIZE - 1);
+    return true;
+}
+
+static bool rx_buffer_read(uint8_t *data)
+{
+    if (rx_buffer.read_index == rx_buffer.write_index)
+    {
+        return false;
+    }
+
+    *data = rx_buffer.data[rx_buffer.read_index];
+    rx_buffer.read_index = (rx_buffer.read_index + 1) & (RX_BUFFER_SIZE - 1);
+    return true;
+}
+
+// UART interrupt handler
 void USART2_Handler(void)
 {
-    if (IS_SET(USART2->SR, TXE)) // TXE is cleared by a write to the USART_DR
+    // Handle TX
+    if (IS_SET(USART2->SR, TXE))
     {
-        if (buffer_index < buffer_length)
+        if (tx_buffer.index < tx_buffer.length)
         {
-            USART2->DR = buffer[buffer_index++];
+            USART2->DR = tx_buffer.data[tx_buffer.index++];
         }
         else
         {
             while (!IS_SET(USART2->SR, TC))
             {
+                // Wait for transmission complete
             }
 
-            buffer_index = 0;
-            buffer_length = 0;
+            tx_buffer_reset();
             CLEAR_BIT(USART2->CR1, TXEIE);
             CLEAR_BIT(USART2->CR1, TCIE);
-            buffer_busy = false;
         }
     }
 
+    // Handle RX
     if (IS_SET(USART2->SR, RXNE))
     {
-        uint8_t next_write = (rx_write_index + 1) % RX_BUFFER_SIZE;
-        if (next_write != rx_read_index) // Buffer not full
+        uint8_t received_data = USART2->DR;
+        if (!rx_buffer_write(received_data))
         {
-            rx_buffer[rx_write_index] = USART2->DR;
-            rx_write_index = next_write;
-        }
-        else
-        {
-            // Buffer full - read DR to clear RXNE flag but discard data
-            (void)USART2->DR;
+            // Buffer full - data is discarded
         }
     }
 }
 
+// Public UART functions
 uint8_t UART2_write(const char *str, uint8_t len)
 {
-    if (buffer_busy)
+    if (!tx_buffer_write(str, len))
     {
         return 0;
-    }
-
-    if (len == 0 || !str || len > BUFFER_SIZE)
-    {
-        return 0;
-    }
-
-    buffer_busy = true;
-    buffer_length = len;
-
-    for (uint8_t i = 0; i < len; i++)
-    {
-        buffer[i] = (uint8_t)str[i];
     }
 
     SET_BIT(USART2->CR1, TXEIE);
     SET_BIT(USART2->CR1, TCIE);
-
     return len;
+}
+
+bool UART2_read(uint8_t *data)
+{
+    return rx_buffer_read(data);
 }
 
 void UART2_init(void)
 {
-    // GPIOA config
-
-    // enable GPIOA
+    // GPIOA configuration
     SET_BIT(RCC->AHB1ENR, GPIOA_EN);
 
-    // set the TX_PIN into AF mode
+    // Configure TX pin
     CLEAR_BIT(GPIOA->MODER, TX_PIN * 2);
     SET_BIT(GPIOA->MODER, TX_PIN * 2 + 1);
-
-    // set the TX_PIN into AF07
     SET_BIT(GPIOA->AFR[0], TX_PIN * 4);
     SET_BIT(GPIOA->AFR[0], TX_PIN * 4 + 1);
     SET_BIT(GPIOA->AFR[0], TX_PIN * 4 + 2);
     CLEAR_BIT(GPIOA->AFR[0], TX_PIN * 4 + 3);
 
-    // set the RX_PIN into AF mode
+    // Configure RX pin
     CLEAR_BIT(GPIOA->MODER, RX_PIN * 2);
     SET_BIT(GPIOA->MODER, RX_PIN * 2 + 1);
-
-    // set the RX_PIN into AF07
     SET_BIT(GPIOA->AFR[0], RX_PIN * 4);
     SET_BIT(GPIOA->AFR[0], RX_PIN * 4 + 1);
     SET_BIT(GPIOA->AFR[0], RX_PIN * 4 + 2);
     CLEAR_BIT(GPIOA->AFR[0], RX_PIN * 4 + 3);
-
     SET_BIT(GPIOA->PUPDR, RX_PIN * 2);
     CLEAR_BIT(GPIOA->PUPDR, RX_PIN * 2 + 1);
 
-    // USART2 config
-
-    // enable the clock to the bus connecting USART2
+    // USART2 configuration
     SET_BIT(RCC->APB1ENR, USART2_EN);
-
-    // set 8 data bits
     CLEAR_BIT(USART2->CR1, M_BIT);
-
-    // set one stop bit
     CLEAR_BIT(USART2->CR2, STOP_BIT);
     CLEAR_BIT(USART2->CR2, STOP_BIT + 1);
-
-    // set oversampling to x16
     CLEAR_BIT(USART2->CR1, OVER8);
-
-    // set three sample majority vote as the method of evaluation
     CLEAR_BIT(USART2->CR3, ONEBIT);
-
-    // set baud rate to 115200
-    // (16 Mhz) / (2 * 8  * 115200) = 8.6806
-    // mantissa  = 8; frac = 0.6806
-    // coded on 4 bits; 0.6806 * 16 = 10.8896; frac = 11
-
-    USART2->BRR = (8 << 4) | (11);
-
-    // turn off parity control
     CLEAR_BIT(USART2->CR1, PCE);
 
-    // Turning on interrupts
+    // Set baud rate to 115200
+    USART2->BRR = (8 << 4) | (11);
 
-    // for TXE
-    // setting this will immediately generate an interrupt since
-    // the TXE register is empty; so we set it when we get a transmission
-    // request in the transmit function; and then clear it when all data is transferred
-    // SET_BIT(USART2->CR1, TXEIE);
-
-    // for TC
-    // we'll set TC in the transmission function too
-    // SET_BIT(USART2->CR1, TCIE); // we clear this too when all data is transferred; we set
-    // it again in the transmission function
-
-    // enable the receive interrupt so that we get notified as soon as we get data
+    // Enable RX interrupt
     SET_BIT(USART2->CR1, RXNEIE);
 
-    // enable interrupts for the USART2 peripheral in the NVIC
-
+    // Enable USART2 interrupts in NVIC
     NVIC_EnableIRQ(USART2_IRQn);
 
-    // enable the transmitter
+    // Enable transmitter and receiver
     SET_BIT(USART2->CR1, TE);
-
-    // enable the receiver
     SET_BIT(USART2->CR1, RE);
 
-    // all the other features will be turned off since the reset
-    // state of their control bits are zero
-    // enable the USART2 module
+    // Enable USART2 module
     SET_BIT(USART2->CR1, UE_BIT);
 }
 
+// Example main function
 #define PIN5 5
 #define LED_PIN PIN5
 
@@ -196,19 +216,19 @@ int main(void)
 {
     UART2_init();
 
-    // set LED pin as output pin
+    // Configure LED pin
     SET_BIT(GPIOA->MODER, 2 * LED_PIN);
     CLEAR_BIT(GPIOA->MODER, 2 * LED_PIN + 1);
 
+    uint8_t received_byte;
     while (true)
     {
-        while (rx_read_index != rx_write_index)
+        if (UART2_read(&received_byte))
         {
-            char byte = rx_buffer[rx_read_index] + 1;
-            rx_read_index = (rx_read_index + 1) % RX_BUFFER_SIZE;
+            char echo_byte = received_byte + 1;
 
             // Try to echo until successful
-            while (UART2_write(&byte, 1) == 0)
+            while (UART2_write(&echo_byte, 1) == 0)
             {
                 // Optional: Could add a timeout here
             }
