@@ -42,6 +42,7 @@ and parity is checked on the received data */
 #define TOGGLE_PIN(reg, bit) ((reg) ^= (1UL << (bit)))
 
 void UART2_init(void);
+bool is_data_available(void);
 
 uint8_t UART2_write(const char *str, uint8_t len);
 bool UART2_write_byte(const char *str);

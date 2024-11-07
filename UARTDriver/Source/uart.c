@@ -72,6 +72,11 @@ static uint8_t tx_buffer_write(const char *str, uint8_t len)
     return actual_written;
 }
 
+bool is_data_available(void)
+{
+    return rx_buffer.read_index != rx_buffer.write_index;
+}
+
 static bool rx_buffer_is_full(void)
 {
     uint8_t next_write = (rx_buffer.write_index + 1) & (RX_BUFFER_SIZE - 1);
@@ -92,7 +97,7 @@ static bool rx_buffer_write(uint8_t data)
 
 static bool rx_buffer_read(uint8_t *data)
 {
-    if (rx_buffer.read_index == rx_buffer.write_index)
+    if (!is_data_available())
     {
         return false;
     }
