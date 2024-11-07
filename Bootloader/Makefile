@@ -4,7 +4,7 @@ OBJCOPY = arm-none-eabi-objcopy
 
 # Directories
 SRCDIR = Source
-BINDIR = Binaries
+BINDIR = ../coresys/bootloader
 COREDIR = ../coresys
 
 # Find all source files
@@ -22,7 +22,7 @@ $(BINDIR)/sysmem.o
 STARTUP = ./Startup/startup.s
 SYSCALLS = $(COREDIR)/PseudoSyscalls/syscalls.c
 SYSMEM = $(COREDIR)/PseudoSyscalls/sysmem.c
-LINKER_SCRIPT = $(COREDIR)/LinkerScript/linker.ld
+LINKER_SCRIPT = ./LinkerScript/linker.ld
 
 # Compiler flags
 CFLAGS = -mcpu=cortex-m4 \

@@ -3,7 +3,7 @@ Archive member included to satisfy reference by file (symbol)
 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-exit.o)
                               /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/crt0.o (exit)
 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-errno.o)
-                              Binaries/syscalls.o (__errno)
+                              ../coresys/bootloader/syscalls.o (__errno)
 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
                               /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/crt0.o (__libc_init_array)
 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
@@ -78,23 +78,23 @@ Discarded input sections
                 0x00000000       0xcf /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/crt0.o
  .ARM.attributes
                 0x00000000       0x20 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/crt0.o
- .data          0x00000000        0x0 Binaries/bootloader.o
- .bss           0x00000000        0x0 Binaries/bootloader.o
- .text          0x00000000       0x20 Binaries/startup.o
- .data          0x00000000        0x0 Binaries/startup.o
- .bss           0x00000000        0x0 Binaries/startup.o
- .text          0x00000000       0xd0 Binaries/syscalls.o
- .data          0x00000000        0x4 Binaries/syscalls.o
- .bss           0x00000000        0x4 Binaries/syscalls.o
- .comment       0x00000000       0x46 Binaries/syscalls.o
+ .data          0x00000000        0x0 ../coresys/bootloader/bootloader.o
+ .bss           0x00000000        0x0 ../coresys/bootloader/bootloader.o
+ .text          0x00000000       0x20 ../coresys/bootloader/startup.o
+ .data          0x00000000        0x0 ../coresys/bootloader/startup.o
+ .bss           0x00000000        0x0 ../coresys/bootloader/startup.o
+ .text          0x00000000       0xd0 ../coresys/bootloader/syscalls.o
+ .data          0x00000000        0x4 ../coresys/bootloader/syscalls.o
+ .bss           0x00000000        0x4 ../coresys/bootloader/syscalls.o
+ .comment       0x00000000       0x46 ../coresys/bootloader/syscalls.o
  .ARM.attributes
-                0x00000000       0x34 Binaries/syscalls.o
- .text          0x00000000       0x40 Binaries/sysmem.o
- .data          0x00000000        0x0 Binaries/sysmem.o
- .bss           0x00000000        0x4 Binaries/sysmem.o
- .comment       0x00000000       0x46 Binaries/sysmem.o
+                0x00000000       0x34 ../coresys/bootloader/syscalls.o
+ .text          0x00000000       0x40 ../coresys/bootloader/sysmem.o
+ .data          0x00000000        0x0 ../coresys/bootloader/sysmem.o
+ .bss           0x00000000        0x4 ../coresys/bootloader/sysmem.o
+ .comment       0x00000000       0x46 ../coresys/bootloader/sysmem.o
  .ARM.attributes
-                0x00000000       0x34 Binaries/sysmem.o
+                0x00000000       0x34 ../coresys/bootloader/sysmem.o
  .text          0x00000000        0x0 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-exit.o)
  .data          0x00000000        0x0 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-exit.o)
  .bss           0x00000000        0x0 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-exit.o)
@@ -338,10 +338,10 @@ Linker script and memory map
 LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crti.o
 LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtbegin.o
 LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/crt0.o
-LOAD Binaries/bootloader.o
-LOAD Binaries/startup.o
-LOAD Binaries/syscalls.o
-LOAD Binaries/sysmem.o
+LOAD ../coresys/bootloader/bootloader.o
+LOAD ../coresys/bootloader/startup.o
+LOAD ../coresys/bootloader/syscalls.o
+LOAD ../coresys/bootloader/sysmem.o
 START GROUP
 LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/libgcc.a
 LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a
@@ -361,24 +361,24 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
 .isr_vector     0x08000000      0x190
                 0x08000000                        . = ALIGN (0x4)
  *(.isr_vector)
- .isr_vector    0x08000000      0x190 Binaries/startup.o
+ .isr_vector    0x08000000      0x190 ../coresys/bootloader/startup.o
                 0x08000000                g_pfnVectors
                 0x08000190                        . = ALIGN (0x4)
 
 .text           0x08000200      0x264
                 0x08000200                        . = ALIGN (0x4)
  *(.text*)
- .text          0x08000200        0x8 Binaries/bootloader.o
+ .text          0x08000200        0x8 ../coresys/bootloader/bootloader.o
                 0x08000200                jump_to_app
- .text.startup  0x08000208        0xa Binaries/bootloader.o
+ .text.startup  0x08000208        0xa ../coresys/bootloader/bootloader.o
                 0x08000208                main
  *fill*         0x08000212        0xe 
  .text.Reset_Handler
-                0x08000220       0x5c Binaries/startup.o
+                0x08000220       0x5c ../coresys/bootloader/startup.o
                 0x08000220                Reset_Handler
  *fill*         0x0800027c       0x84 
  .text.Default_Handler
-                0x08000300      0x100 Binaries/startup.o
+                0x08000300      0x100 ../coresys/bootloader/startup.o
                 0x08000300                DebugMon_Handler
                 0x08000300                HardFault_Handler
                 0x08000300                SysTick_Handler
@@ -391,7 +391,7 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
                 0x08000300                USART2_Handler
                 0x08000300                BusFault_Handler
  .text.SystemInit
-                0x08000400        0x2 Binaries/startup.o
+                0x08000400        0x2 ../coresys/bootloader/startup.o
                 0x08000400                SystemInit
  *fill*         0x08000402        0x2 
  .text.__libc_init_array
@@ -421,10 +421,10 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
  .v4_bx         0x08000464        0x0 linker stubs
 
 .iplt           0x08000464        0x0
- .iplt          0x08000464        0x0 Binaries/bootloader.o
+ .iplt          0x08000464        0x0 ../coresys/bootloader/bootloader.o
 
 .rel.dyn        0x08000464        0x0
- .rel.iplt      0x08000464        0x0 Binaries/bootloader.o
+ .rel.iplt      0x08000464        0x0 ../coresys/bootloader/bootloader.o
 
 .rodata         0x08000464        0x0
                 0x08000464                        . = ALIGN (0x4)
@@ -442,7 +442,7 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
                 0x20000000                        _edata = .
 
 .igot.plt       0x20000000        0x0
- .igot.plt      0x20000000        0x0 Binaries/bootloader.o
+ .igot.plt      0x20000000        0x0 ../coresys/bootloader/bootloader.o
 
 .bss            0x20000000        0x0
                 0x20000000                        . = ALIGN (0x4)
@@ -473,23 +473,23 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
  .ARM.attributes
                 0x00000000       0x22 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crti.o
  .ARM.attributes
-                0x00000022       0x34 Binaries/bootloader.o
+                0x00000022       0x34 ../coresys/bootloader/bootloader.o
  .ARM.attributes
-                0x00000056       0x21 Binaries/startup.o
+                0x00000056       0x21 ../coresys/bootloader/startup.o
  .ARM.attributes
                 0x00000077       0x34 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
  .ARM.attributes
                 0x000000ab       0x22 /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/crtn.o
                 0x20000000                        __heap_base = __bss_end__
                 0x20017c00                        __heap_limit = __stack_limit
-OUTPUT(Binaries/bootloader.elf elf32-littlearm)
+OUTPUT(../coresys/bootloader/bootloader.elf elf32-littlearm)
 LOAD linker stubs
 LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc.a
 LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libm.a
 LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/libgcc.a
 
 .comment        0x00000000       0x45
- .comment       0x00000000       0x45 Binaries/bootloader.o
+ .comment       0x00000000       0x45 ../coresys/bootloader/bootloader.o
                                  0x46 (size before relaxing)
 
 .debug_frame    0x00000000       0x2c

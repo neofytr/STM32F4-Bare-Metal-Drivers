@@ -81,7 +81,7 @@ Discarded input sections
  .text          0x00000000        0x0 Binaries/main.o
  .data          0x00000000        0x0 Binaries/main.o
  .bss           0x00000000        0x0 Binaries/main.o
- .text          0x00000000       0x20 Binaries/startup.o
+ .text          0x00000000       0x14 Binaries/startup.o
  .data          0x00000000        0x0 Binaries/startup.o
  .bss           0x00000000        0x0 Binaries/startup.o
  .text          0x00000000       0xd0 Binaries/syscalls.o
@@ -359,6 +359,16 @@ LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/h
                 0x20017c00                        __stack_limit = (__RAM_END - __Min_Stack_Size)
                 0x20018000                        _estack = __RAM_END
 
+_bootloader_    0x08000000      0x470
+                0x08000000                        . = ALIGN (0x4)
+ *(_bootloader_)
+ _bootloader_   0x08000000      0x470 Binaries/startup.o
+                0x08000470                        . = ALIGN (0x4)
+
+.comment        0x00000000       0x45
+ .comment       0x00000000       0x45 Binaries/main.o
+                                 0x46 (size before relaxing)
+
 .isr_vector     0x08000000      0x190
                 0x08000000                        . = ALIGN (0x4)
  *(.isr_vector)
@@ -485,10 +495,6 @@ LOAD linker stubs
 LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc.a
 LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libm.a
 LOAD /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m+fp/hard/libgcc.a
-
-.comment        0x00000000       0x45
- .comment       0x00000000       0x45 Binaries/main.o
-                                 0x46 (size before relaxing)
 
 .debug_frame    0x00000000       0x2c
  .debug_frame   0x00000000       0x2c /opt/gcc-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
