@@ -51,7 +51,7 @@ static bool tx_buffer_is_full(void)
     return (tx_buffer.read_index == next_write);
 }
 
-static uint8_t tx_buffer_write(const char *str, uint8_t len)
+static uint8_t tx_buffer_write(const uint8_t *str, uint8_t len)
 {
     if (!str || len == 0 || len > TX_BUFFER_SIZE)
     {
@@ -139,7 +139,7 @@ void USART2_Handler(void)
     }
 }
 
-uint8_t UART2_write(const char *str, uint8_t len)
+uint8_t UART2_write(const uint8_t *str, uint8_t len)
 {
     uint8_t return_val = tx_buffer_write(str, len);
     // Enable TX interrupts
@@ -148,7 +148,7 @@ uint8_t UART2_write(const char *str, uint8_t len)
     return return_val;
 }
 
-bool UART2_write_byte(const char *str)
+bool UART2_write_byte(const uint8_t *str)
 {
     return UART2_write(str, 1);
 }

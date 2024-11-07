@@ -10,6 +10,11 @@
 #define PAKCET_CRC_INPUT_LENGTH (PACKET_DATA_LENGTH + PACKET_LENGTH_BYTES)
 #define PACKET_LENGTH (PACKET_DATA_LENGTH + PACKET_LENGTH_BYTES + PACKET_CRC_BYTES)
 
+#define PACKET_RETX_DATA0 (0x19)
+#define PACKET_ACK_DATA0 (0x15)
+#define PACKET_RETX_DATA_LENGTH (1)
+#define PACKET_ACK_DATA_LENGTH (1)
+
 typedef struct comms_packet_
 {
     uint8_t length;
@@ -23,5 +28,6 @@ void comms_update(void);
 bool comms_packet_available(void);
 void comms_write(comms_packet_t *packet);
 void comms_read(comms_packet_t *packet);
+uint8_t comms_compute_crc(comms_packet_t *packet);
 
 #endif /* FE21EE1A_0B0A_4546_9BD6_FA0425C87443 */

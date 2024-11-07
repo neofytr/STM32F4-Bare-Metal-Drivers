@@ -44,8 +44,8 @@ and parity is checked on the received data */
 void UART2_init(void);
 bool is_data_available(void);
 
-uint8_t UART2_write(const char *str, uint8_t len);
-bool UART2_write_byte(const char *str);
+uint8_t UART2_write(const uint8_t *str, uint8_t len);
+bool UART2_write_byte(const uint8_t *str);
 
 bool UART2_read_byte(uint8_t *data);
 uint8_t UART2_read(uint8_t *data, uint8_t len);
@@ -126,10 +126,10 @@ USART_CR1 register.
 
 The TX is in low state during start bit. It is in high state during the stop bit.
 
-An Idle character is interpreted as an entire frame full of 1's followed by the start bit of the
+An Idle uint8_tacter is interpreted as an entire frame full of 1's followed by the start bit of the
 next frame which contains data (The number of 1's will include the number of stop bits).
 
-A Break character is interpreted on receiving 0s for a frame period. At the end of the break frame
+A Break uint8_tacter is interpreted on receiving 0s for a frame period. At the end of the break frame
 the transmitter inserts either 1 or 2 stop bits (logic 1) to acknowledge the start bit.
 
 Transmission and reception are driven by a common baud rate generator, the clock for each
@@ -167,7 +167,7 @@ During an USART transmission, data shifts out least significant bit first on the
 mode, the USART_DR register consists of a buffer (TDR) between the internal bus and the transmit shift
 register.
 
-Every character is preceded by a start bit which is a logic low for one bit period. The character is terminated
+Every uint8_tacter is preceded by a start bit which is a logic low for one bit period. The uint8_tacter is terminated
 by a configurable number of stop bits.
 
 The following stop bits are supported by USART: 0.5, 1, 1.5 and 2 stop bits.
@@ -178,7 +178,7 @@ current data being transmitted will be lost.
 
 An idle frame will be sent after the TE bit is enabled.
 
-The number of stop bits to be transmitted with every character can be programmed in Control
+The number of stop bits to be transmitted with every uint8_tacter can be programmed in Control
 register 2, bits 13, 12
 
 1 stop bit is the default value.
@@ -234,20 +234,20 @@ The TC bit is cleared by the following software sequence:
 The TC bit can also be cleared by writing a ‘0 to it. This clearing sequence is recommended
 only for Multibuffer communication.
 
-### Break characters
+### Break uint8_tacters
 
-Setting the SBK bit transmits a break character. The break frame length depends on the M bit.
+Setting the SBK bit transmits a break uint8_tacter. The break frame length depends on the M bit.
 
-If the SBK bit is set to 1, a break character is sent on the TX line after completing the current
-character transmission. This bit is reset by hardware when the break character is completed
-(during the stop bit of the break character). The USART inserts a logic 1 bit at the end of the last
+If the SBK bit is set to 1, a break uint8_tacter is sent on the TX line after completing the current
+uint8_tacter transmission. This bit is reset by hardware when the break uint8_tacter is completed
+(during the stop bit of the break uint8_tacter). The USART inserts a logic 1 bit at the end of the last
 break frame to guarantee the recognition of the start bit of the next frame.
 
 If the software resets the SBK bit before the commencement of break transmission, the
-break character will not be transmitted. For two consecutive breaks, the SBK bit should be
+break uint8_tacter will not be transmitted. For two consecutive breaks, the SBK bit should be
 set after the stop bit of the previous break.
 
-### Idle characters
+### Idle uint8_tacters
 
 Setting the TE bit drives the USART to send an idle frame before the first data frame.
 
@@ -296,7 +296,7 @@ Procedure:
 5. Set the RE bit in USART_CR1. This enables the receiver which begins searching for a
 start bit.
 
-When a character is received:
+When a uint8_tacter is received:
 
 1. The RXNE bit is set. It indicates that the contents of the shift register is transferred
 to the RDR. In other words, data has been received and can be read (as well as it's associated
@@ -306,18 +306,18 @@ error flags).
 during reception.
 4. In single buffer mode, clearing the RXNE bit is performed by a software read to the
 USART_DR register. The RXNE flag can also be cleared by writing a zero to it. The RXNE bit must be
-cleared before the end of the reception of the next character to avoid an overrun error.
+cleared before the end of the reception of the next uint8_tacter to avoid an overrun error.
 
 The RE bit should not be reset while receiving data. If the RE bit is disabled during
 reception, the reception of the current byte will be aborted.
 
-Break character
+Break uint8_tacter
 
-When a break character is received, the USART handles it as a framing error.
+When a break uint8_tacter is received, the USART handles it as a framing error.
 
-Idle character
+Idle uint8_tacter
 
-When an idle frame is detected, there is the same procedure as a data received character
+When an idle frame is detected, there is the same procedure as a data received uint8_tacter
 plus an interrupt if the IDLEIE bit is set.
 
 Overrun error
@@ -340,7 +340,7 @@ still contains the previously received byte, which remains unchanged until it is
 
 An overrun error typically means that at least one byte was lost. This might not be a problem if no data is expected after the missed byte, but if a continuous data stream is being received, this can lead to missed or corrupted data.
 
-An overrun error occurs when a character is received when RXNE has not been reset. Data can not be
+An overrun error occurs when a uint8_tacter is received when RXNE has not been reset. Data can not be
 transmitted from the shift register to the RDR register until the RXNE bit is cleared.
 
 The RXNE flag is set after every byte received. An overrun error occurs if RXNE flag is set

@@ -19,13 +19,13 @@ int main(void)
             if (received_byte == '1')
             {
                 TOGGLE_PIN(GPIOA->ODR, LED_PIN);
-                const char str[] = "\r\nLED Toggled!\r\n";
+                const uint8_t str[] = "\r\nLED Toggled!\r\n";
                 while (!UART2_write(str, (uint8_t)strlen(str)))
                     ;
             }
             else
             {
-                char echo_byte = received_byte + 1;
+                uint8_t echo_byte = received_byte + 1;
 
                 // try to echo until successful
                 while (!UART2_write_byte(&echo_byte))
