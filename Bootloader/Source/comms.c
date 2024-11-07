@@ -82,10 +82,10 @@ static bool comms_is_retx_packet(const comms_packet_t *packet)
 
 uint8_t comms_compute_crc(comms_packet_t *packet)
 {
-    return crc8((uint8_t *)(packet), PAKCET_CRC_INPUT_LENGTH);
+    return calculate_crc8((uint8_t *)(packet), PAKCET_CRC_INPUT_LENGTH);
 }
 
-comms_setup(void)
+void comms_setup(void)
 {
     retx_packet.length = PACKET_RETX_DATA_LENGTH;
     retx_packet.data[0] = PACKET_RETX_DATA0;
@@ -173,6 +173,18 @@ void comms_update(void)
     }
 }
 
-bool comms_packet_available(void);
-void comms_write(comms_packet_t *packet);
-void comms_read(comms_packet_t *packet);
+bool comms_packet_available(void)
+{
+    return (packet_buffer_read_index != packet_buffer_write_index);
+}
+
+void comms_write(comms_packet_t *packet)
+{
+    UART2_write((uint8_t *)packet, PACKET_LENGTH);
+}
+
+void comms_read(comms_packet_t *packet)
+{
+    comms_packet_copy(&(packet_buffer[packet_buffer_read_index]), packet);
+    packet_buffer_read_index = (packet_buffer_read_index + 1) & PACKET_BUFFER_MASK;
+}
