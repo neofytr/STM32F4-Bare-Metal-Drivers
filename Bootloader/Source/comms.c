@@ -1,5 +1,5 @@
 #include "../Include/comms.h"
-#include "../../UARTDriver/Include/uart.h"
+#include "../Include/uart.h"
 #include "../Include/crc8.h"
 
 typedef enum comms_state_
@@ -16,7 +16,7 @@ static comms_packet_t retx_packet = {0};
 static comms_packet_t ack_packet = {0};
 static comms_packet_t last_transmitted_packet = {0};
 
-#define PACKET_BUFFER_SIZE 16
+#define PACKET_BUFFER_SIZE (16)
 #define PACKET_BUFFER_MASK (PACKET_BUFFER_SIZE - 1)
 
 static comms_packet_t packet_buffer[PACKET_BUFFER_SIZE];
@@ -82,7 +82,7 @@ static bool comms_is_retx_packet(const comms_packet_t *packet)
 
 uint8_t comms_compute_crc(comms_packet_t *packet)
 {
-    return calculate_crc8((uint8_t *)(packet), PAKCET_CRC_INPUT_LENGTH);
+    return calculate_crc8((uint8_t *)(packet), PACKET_CRC_INPUT_LENGTH);
 }
 
 void comms_setup(void)
@@ -95,12 +95,13 @@ void comms_setup(void)
     }
     retx_packet.crc = comms_compute_crc(&retx_packet);
 
-    retx_packet.length = PACKET_ACK_DATA_LENGTH;
-    retx_packet.data[0] = PACKET_ACK_DATA0;
+    ack_packet.length = PACKET_ACK_DATA_LENGTH;
+    ack_packet.data[0] = PACKET_ACK_DATA0;
     for (uint8_t i = PACKET_ACK_DATA_LENGTH; i < PACKET_DATA_LENGTH; i++)
     {
         ack_packet.data[i] = 0xFF;
     }
+    ack_packet.crc = comms_compute_crc(&ack_packet);
 }
 
 void comms_update(void)
@@ -181,6 +182,7 @@ bool comms_packet_available(void)
 void comms_write(comms_packet_t *packet)
 {
     UART2_write((uint8_t *)packet, PACKET_LENGTH);
+    comms_packet_copy(packet, &last_transmitted_packet);
 }
 
 void comms_read(comms_packet_t *packet)
