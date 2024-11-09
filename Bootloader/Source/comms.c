@@ -120,12 +120,8 @@ void comms_update(void)
         case CommsState_Data:
         {
             UART2_read_byte(&(temporary_packet.data[data_byte_count++]));
-            if (data_byte_count == temporary_packet.length)
+            if (data_byte_count == PACKET_DATA_LENGTH)
             {
-                for (uint8_t i = data_byte_count; i < PACKET_DATA_LENGTH; i++)
-                {
-                    temporary_packet.data[i] = 0xFF;
-                }
                 data_byte_count = 0;
                 state = CommsState_CRC;
             }

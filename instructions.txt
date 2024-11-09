@@ -1,0 +1,9 @@
+st-util
+
+
+gdb-multiarch bootloader.elf
+target extended-remote:4242
+monitor reset halt
+load
+
+break and all that

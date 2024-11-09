@@ -3,7 +3,7 @@ CC = arm-none-eabi-gcc
 OBJCOPY = arm-none-eabi-objcopy
 
 # Directories
-SRCDIR = Source
+SRCDIR = ./Source
 BINDIR = ../coresys/bootloader
 COREDIR = ../coresys
 
@@ -31,9 +31,10 @@ CFLAGS = -mcpu=cortex-m4 \
 	-mfloat-abi=hard \
 	-DSTM32F401RETx \
 	-DNUCLEO_F401RE \
-	-O2 -Os \
+	-O0 -O \
 	-Wall \
-	--specs=nano.specs
+	--specs=nano.specs \
+	-g
 
 # Linker flags
 LDFLAGS = -T$(LINKER_SCRIPT) \
@@ -76,11 +77,5 @@ $(BINDIR)/bootloader.bin: $(BINDIR)/bootloader.elf
 # Clean
 clean:
 	rm -rf $(BINDIR)
-
-flash:
-	python3 bootloader_resizer.py
-	st-flash write $(BINDIR)/output.bin 0x08008000
-	st-flash write $(BINDIR)/bootloader.bin 0x08000000 
-	st-flash reset
 
 .PHONY: all clean directories
