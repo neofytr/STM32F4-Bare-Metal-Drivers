@@ -6,6 +6,7 @@ OBJCOPY = arm-none-eabi-objcopy
 SRCDIR = ./Source
 BINDIR = ../coresys/bootloader
 COREDIR = ../coresys
+COREBIN = ../coresys/bootloader/bootloader.bin
 
 # Find all source files
 SRC = $(wildcard $(SRCDIR)/*.c)
@@ -77,5 +78,8 @@ $(BINDIR)/bootloader.bin: $(BINDIR)/bootloader.elf
 # Clean
 clean:
 	rm -rf $(BINDIR)
+
+flash:
+	st-flash write $(COREBIN) 0x08000000
 
 .PHONY: all clean directories
