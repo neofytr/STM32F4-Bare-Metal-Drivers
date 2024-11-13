@@ -1,0 +1,12 @@
+/home/raj/Desktop/STM32Drivers/uart_reader/target/debug/deps/libserialport-97332002301f82f9.rmeta: /home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/lib.rs /home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/mod.rs /home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/enumerate.rs /home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/error.rs /home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/ioctl.rs /home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/poll.rs /home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/termios.rs /home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/tty.rs
+
+/home/raj/Desktop/STM32Drivers/uart_reader/target/debug/deps/serialport-97332002301f82f9.d: /home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/lib.rs /home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/mod.rs /home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/enumerate.rs /home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/error.rs /home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/ioctl.rs /home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/poll.rs /home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/termios.rs /home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/tty.rs
+
+/home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/lib.rs:
+/home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/mod.rs:
+/home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/enumerate.rs:
+/home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/error.rs:
+/home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/ioctl.rs:
+/home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/poll.rs:
+/home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/termios.rs:
+/home/raj/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serialport-4.6.0/src/posix/tty.rs:
