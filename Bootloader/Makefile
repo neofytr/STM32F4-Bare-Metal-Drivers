@@ -79,7 +79,4 @@ $(BINDIR)/bootloader.bin: $(BINDIR)/bootloader.elf
 clean:
 	rm -rf $(BINDIR)
 
-flash:
-	st-flash write $(COREBIN) 0x08000000
-
 .PHONY: all clean directories
