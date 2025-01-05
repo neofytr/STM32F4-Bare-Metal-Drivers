@@ -33,7 +33,9 @@ Similarly, data sent from the USART2 of STM32 can travel back to the computer th
 
 The parity control bit sets the hardware parity control (generation and detection)/
 When the parity control is enabled, the computed parity is inserted at the MSB position (9th if word bit is 1, and 8th if its 0)
-and parity is checked on the received data */
+and parity is checked on the received data
+
+*/
 
 #define SET_BIT(reg, bit) ((reg) |= (1UL << (bit)))
 #define CLEAR_BIT(reg, bit) ((reg) &= ~(1UL << (bit)))
